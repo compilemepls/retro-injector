@@ -1,4 +1,4 @@
-"""New UI themes must land next to the existing ones without moving the
+"""UI themes must land next to the existing ones without moving the
 Sortable script tag (S4 hashes that region) or dropping old option values.
 """
 import os
@@ -9,23 +9,11 @@ from retro.utils.config import Config
 
 UI_DIR = os.path.join(os.path.dirname(__file__), "..", "retro", "interface", "assets")
 INDEX = os.path.join(UI_DIR, "index.html")
-FONTS = os.path.join(UI_DIR, "fonts")
+FONTS = os.path.join(UI_DIR, "fonts", "fonts")
 
-OLD_THEMES = ("legacy", "ignite", "matrix", "cherry", "premium")
-NEW_THEMES = ("studio", "nocturne", "mocha", "vellum", "aurora", "neko")
-THEME_CLASSES = (
-    "theme-legacy",
-    "theme-ignite",
-    "theme-matrix",
-    "theme-cherry",
-    "theme-studio",
-    "theme-nocturne",
-    "theme-mocha",
-    "theme-vellum",
-    "theme-aurora",
-    "theme-neko",
-    "theme-bw",
-)
+KEPT_THEMES = ("legacy", "premium")
+NEW_THEMES = ("cyberpunk", "nebula", "synthwave", "ember", "abyss", "plasma")
+THEME_CLASSES = tuple(f"theme-{t}" for t in NEW_THEMES)
 REQUIRED_FONTS = (
     "inter-400.woff2",
     "syne-700.woff2",
@@ -60,15 +48,11 @@ def test_sortable_script_tag_untouched():
     assert b"intersection-polyfill" not in region
 
 
-def test_old_theme_classes_still_present():
+def test_kept_theme_classes_and_options_present():
     html = _index_text()
-    for name in ("theme-legacy", "theme-ignite", "theme-matrix", "theme-cherry"):
-        assert f".{name}" in html
+    assert ".theme-legacy" in html
+    assert 'value="legacy"' in html
     assert 'value="premium"' in html
-    for name in OLD_THEMES:
-        if name == "premium":
-            continue
-        assert f'value="{name}"' in html
 
 
 def test_new_theme_classes_and_options_present():
@@ -79,51 +63,34 @@ def test_new_theme_classes_and_options_present():
         assert f'"theme-{name}"' in html  # setUITheme classList.remove
 
 
-def test_aurora_neko_keep_light_toggle_and_canvas():
+def test_old_themes_removed():
     html = _index_text()
-    start = html.find("const forceDark")
-    assert start > 0
-    chunk = html[start : start + 350]
-    assert "aurora" not in chunk
-    assert "neko" not in chunk
-    assert 'id="aurora-canvas"' in html
-    assert 'id="neko-canvas"' in html
-    assert "body.theme-aurora.light-theme" in html
-    assert "body.theme-neko.light-theme" in html
-    assert "Retro Injector Space Grotesk" in html
-    assert "Retro Injector outfit" in html
-    assert "conic-gradient" not in html
-    assert 'value="neko"' in html
+    removed = ("ignite", "matrix", "cherry", "studio", "nocturne", "mocha",
+               "vellum", "aurora", "neko", "bw")
+    for name in removed:
+        assert f".theme-{name}" not in html, f".theme-{name} should be gone"
+        assert f'value="{name}"' not in html, f'value="{name}" should be gone'
 
 
-def test_bw_theme_keeps_light_toggle():
+def test_new_theme_canvases_present():
     html = _index_text()
-    assert "body.theme-bw {" in html
-    assert 'value="bw"' in html
-    assert '"theme-bw"' in html
-    assert "body.theme-bw.light-theme" in html
-    assert 'value="pitch"' not in html
-    dark = html.find(".theme-bw {")
-    assert dark > 0
-    dark_block = html[dark : dark + 900]
-    assert "--bg-base: #000000" in dark_block
-    assert "--accent: #ffffff" in dark_block
-    light = html.find("body.theme-bw.light-theme")
-    light_block = html[light : light + 900]
-    assert "--bg-base: #ffffff" in light_block
-    assert "--accent: #000000" in light_block
-    start = html.find("const forceDark")
-    assert start > 0
-    end = html.find("toggleTheme(false)", start)
-    assert end > 0
-    chunk = html[start : end + len("toggleTheme(false)")]
-    assert 'theme === "bw"' not in chunk
-    # Legacy first, Black & White last in the UI Theme select.
-    sel = html.find('id="settings-ui-theme"')
-    sel_end = html.find("</select>", sel)
-    opts = html[sel:sel_end]
-    assert opts.find('value="legacy"') < opts.find('value="premium"')
-    assert opts.rfind('value="bw"') > opts.rfind('value="neko"')
+    for name in NEW_THEMES:
+        assert f'id="{name}-canvas"' in html, name
+
+
+def test_new_theme_animations_present():
+    html = _index_text()
+    for name in NEW_THEMES:
+        cap = name.capitalize()
+        assert f"toggle{cap}Anim" in html, name
+        assert f"draw{cap}" in html, name
+        assert f"resize{cap}" in html, name
+
+
+def test_old_canvases_removed():
+    html = _index_text()
+    for cid in ("matrix-canvas", "petals-canvas", "aurora-canvas", "neko-canvas"):
+        assert cid not in html, cid
 
 
 def test_set_ui_theme_clears_every_skin_class():
@@ -132,7 +99,7 @@ def test_set_ui_theme_clears_every_skin_class():
     assert start > 0
     chunk = html[start : start + 1800]
     for cls in THEME_CLASSES:
-        assert f'"{cls}"' in chunk
+        assert f'"{cls}"' in chunk, cls
 
 
 def test_bundled_theme_fonts_exist():
@@ -146,7 +113,7 @@ def test_set_ui_theme_persists_new_ids(monkeypatch):
     api = Api.__new__(Api)
     api.settings = {}
     monkeypatch.setattr(Config, "save_settings", lambda *_a, **_k: True)
-    for name in NEW_THEMES + ("bw",):
+    for name in NEW_THEMES:
         api.set_ui_theme(name)
         assert api.settings["ui_theme"] == name
 

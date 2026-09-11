@@ -235,1034 +235,7 @@
                 --warning: #c89000;
             }
 
-            /* === Black & White (flat #000; Light Mode is full #fff) === */
-            .theme-bw {
-                --bg-base: #000000;
-                --bg-sidebar: #000000;
-                --bg-panel: #000000;
-                --bg-card: #0a0a0a;
-                --bg-elevated: #0a0a0a;
-                --bg-hover: #141414;
-                --bg-input: #000000;
-                --bg-selected: rgba(255, 255, 255, 0.12);
-                --border: #222222;
-                --border-light: #2a2a2a;
-                --text: #ffffff;
-                --text-dim: #aaaaaa;
-                --text-dark: #666666;
-                --accent: #ffffff;
-                --accent-hover: #e0e0e0;
-                --accent-dim: #888888;
-                --accent-glow: rgba(255, 255, 255, 0.16);
-                --purple: #cccccc;
-                --purple-hover: #ffffff;
-                --success: #ffffff;
-                --error: #ffffff;
-                --warning: #cccccc;
-                --btn-ink: #000000;
-            }
-            body.theme-bw {
-                background: #000000 !important;
-            }
-            body.theme-bw.light-theme {
-                --bg-base: #ffffff;
-                --bg-sidebar: #ffffff;
-                --bg-panel: #ffffff;
-                --bg-card: #ffffff;
-                --bg-elevated: #f4f4f4;
-                --bg-hover: #ececec;
-                --bg-input: #ffffff;
-                --bg-selected: rgba(0, 0, 0, 0.08);
-                --border: #e5e5e5;
-                --border-light: #ececec;
-                --text: #000000;
-                --text-dim: #555555;
-                --text-dark: #888888;
-                --accent: #000000;
-                --accent-hover: #222222;
-                --accent-dim: #666666;
-                --accent-glow: rgba(0, 0, 0, 0.12);
-                --purple: #444444;
-                --purple-hover: #000000;
-                --success: #000000;
-                --error: #000000;
-                --warning: #444444;
-                --btn-ink: #ffffff;
-                background: #ffffff !important;
-            }
-            .theme-bw .btn-primary {
-                background: #ffffff !important;
-                color: #000000 !important;
-                box-shadow: none !important;
-            }
-            .theme-bw .btn-primary:hover:not(:disabled) {
-                background: #e0e0e0 !important;
-            }
-            .theme-bw .btn-secondary {
-                background: #222222 !important;
-                color: #ffffff !important;
-            }
-            .theme-bw .btn-secondary:hover {
-                background: #333333 !important;
-                box-shadow: none !important;
-            }
-            body.theme-bw.light-theme .btn-primary {
-                background: #000000 !important;
-                color: #ffffff !important;
-            }
-            body.theme-bw.light-theme .btn-primary:hover:not(:disabled) {
-                background: #222222 !important;
-            }
-            body.theme-bw.light-theme .btn-secondary {
-                background: #ececec !important;
-                color: #000000 !important;
-            }
-            body.theme-bw.light-theme .btn-secondary:hover {
-                background: #dddddd !important;
-            }
-
-            /* === Ignite Theme (Orange/Red/Black) === */
-            .theme-ignite {
-                --bg-base: #060301;
-                --bg-sidebar: rgba(14, 5, 2, 0.7);
-                --bg-panel: rgba(22, 8, 4, 0.75);
-                --bg-card: rgba(30, 10, 5, 0.85);
-                --bg-elevated: rgba(45, 15, 8, 0.9);
-                --bg-hover: rgba(85, 30, 15, 0.4);
-                --bg-input: rgba(10, 4, 2, 0.85);
-                --bg-selected: rgba(255, 100, 0, 0.15);
-                --border: rgba(255, 80, 0, 0.15);
-                --border-light: rgba(255, 120, 30, 0.2);
-                --text: #ffeadd;
-                --text-dim: #ba7658;
-                --text-dark: #804020;
-                --accent: #ff5500;
-                --accent-hover: #ff7700;
-                --accent-dim: #cc4400;
-                --accent-glow: rgba(255, 85, 0, 0.4);
-                --purple: #e61919;
-                --purple-hover: #ff3333;
-                --success: #ffaa00;
-                --error: #ff2222;
-                --warning: #ff8800;
-            }
-
-            /* === IGNITE THEME: HYPER-PREMIUM OVERRIDES === */
-            body.theme-ignite {
-                background:
-                    radial-gradient(
-                        ellipse at top left,
-                        rgba(255, 60, 0, 0.15) 0%,
-                        transparent 40%
-                    ),
-                    radial-gradient(
-                        ellipse at bottom right,
-                        rgba(255, 0, 0, 0.1) 0%,
-                        transparent 45%
-                    ),
-                    #050201 !important;
-            }
-
-            .theme-ignite .btn-primary {
-                background: linear-gradient(
-                    135deg,
-                    #ff2a00,
-                    #ff7b00
-                ) !important;
-                border: 1px solid rgba(255, 100, 0, 0.4) !important;
-                box-shadow: 0 4px 15px var(--accent-glow) !important;
-                color: #fff !important;
-                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-            }
-            .theme-ignite .btn-primary:hover:not(:disabled) {
-                box-shadow: 0 6px 25px var(--accent-glow) !important;
-            }
-
-            .theme-ignite .config-item {
-                border-left: 2px solid transparent;
-                border-right: 1px solid transparent;
-            }
-            .theme-ignite .config-item:hover {
-                background: linear-gradient(
-                    90deg,
-                    var(--bg-hover) 0%,
-                    transparent 100%
-                );
-                border-left: 2px solid var(--accent-dim);
-            }
-            .theme-ignite .config-item.selected {
-                background: linear-gradient(
-                    90deg,
-                    rgba(255, 80, 0, 0.15) 0%,
-                    rgba(255, 20, 0, 0.02) 100%
-                ) !important;
-                border-left: 3px solid var(--accent) !important;
-                border-right: 1px solid rgba(255, 80, 0, 0.2) !important;
-                box-shadow: inset 2px 0 15px rgba(255, 65, 0, 0.2);
-            }
-
-            .theme-ignite .titlebar-title {
-                background: linear-gradient(90deg, #ff3300, #ffaa00);
-                -webkit-background-clip: text;
-                background-clip: text;
-                -webkit-text-fill-color: transparent;
-                font-weight: 800;
-                letter-spacing: 0.5px;
-            }
-
-            .theme-ignite .config-title {
-                background: linear-gradient(90deg, #ff5500, #ffaa00);
-                -webkit-background-clip: text;
-                background-clip: text;
-                -webkit-text-fill-color: transparent;
-            }
-
-            .theme-ignite .sidebar {
-                border-right: 1px solid rgba(255, 80, 0, 0.15) !important;
-                box-shadow: 4px 0 30px rgba(255, 50, 0, 0.08) !important;
-            }
-
-            .theme-ignite .titlebar-icon {
-                background: linear-gradient(
-                    135deg,
-                    #ff1100,
-                    #ff8800
-                ) !important;
-                box-shadow: 0 0 12px rgba(255, 50, 0, 0.5) !important;
-                color: white !important;
-                text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
-                border: 1px solid rgba(255, 255, 255, 0.2);
-            }
-
-            .theme-ignite .toggle input:checked + .toggle-slider {
-                background: linear-gradient(90deg, #ff2a00, #ff7b00) !important;
-                box-shadow: 0 0 12px var(--accent-glow) !important;
-            }
-
-            .theme-ignite ::-webkit-scrollbar-thumb {
-                background: linear-gradient(
-                    180deg,
-                    #cc4400,
-                    #ff1100
-                ) !important;
-                border-radius: 4px;
-                box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
-            }
-            .theme-ignite ::-webkit-scrollbar-thumb:hover {
-                background: linear-gradient(
-                    180deg,
-                    #ff5500,
-                    #ff3333
-                ) !important;
-            }
-
-            /* Fallback so editable fields never fall back to the UA default
-               (black) text on dark themes. No !important â€” any explicit/inline
-               color still wins. */
-            input:not([type="checkbox"]):not([type="range"]),
-            textarea,
-            [contenteditable] {
-                color: var(--text);
-            }
-
-            /* === MATRIX THEME (Hacker Terminal) === */
-            body.theme-matrix {
-                background: #010401 !important;
-                --font-ui: var(--font-mono) !important;
-            }
-            body.theme-matrix::before {
-                content: "";
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100vw;
-                height: 100vh;
-                background: repeating-linear-gradient(
-                    0deg,
-                    rgba(0, 0, 0, 0.15),
-                    rgba(0, 0, 0, 0.15) 1px,
-                    transparent 1px,
-                    transparent 2px
-                );
-                pointer-events: none;
-                z-index: 9999;
-            }
-            .theme-matrix {
-                --bg-base: rgba(8, 4, 20, 0.4);
-                --bg-sidebar: rgba(10, 6, 24, 0.85);
-                --bg-panel: rgba(14, 8, 30, 0.85);
-                --bg-card: rgba(18, 10, 38, 0.85);
-                --bg-elevated: rgba(24, 14, 50, 0.9);
-                --bg-hover: rgba(168, 130, 255, 0.15);
-                --bg-input: rgba(10, 6, 24, 0.9);
-                --bg-selected: rgba(168, 130, 255, 0.2);
-                --border: #a78bfa;
-                --border-light: #c4b5fd;
-                --text: #c4b5fd;
-                --text-dim: #6d28d9;
-                --text-dark: #3b1880;
-                --accent: #a78bfa;
-                --accent-hover: #c4b5fd;
-                --accent-dim: #6d28d9;
-                --accent-glow: rgba(168, 130, 255, 0.6);
-                --purple: #a78bfa;
-                --purple-hover: #c4b5fd;
-                --success: #a78bfa;
-                --error: #ff003c;
-                --warning: #ffcc00;
-                --radius: 0px !important;
-                --radius-lg: 0px !important;
-            }
-
-            .theme-matrix .btn {
-                text-transform: uppercase;
-                letter-spacing: 1px;
-                box-shadow: none !important;
-                border-radius: 0 !important;
-            }
-            .theme-matrix .btn-primary {
-                background: rgba(168, 130, 255, 0.1) !important;
-                border: 1px solid var(--accent) !important;
-                color: var(--accent) !important;
-                box-shadow: inset 0 0 10px rgba(168, 130, 255, 0.2) !important;
-                text-shadow: 0 0 5px var(--accent) !important;
-            }
-            .theme-matrix .btn-primary:hover:not(:disabled),
-            .theme-matrix .btn-secondary:hover {
-                background: var(--accent) !important;
-                color: #ffffff !important;
-                box-shadow: 0 0 15px var(--accent) !important;
-            }
-            .theme-matrix .btn-secondary {
-                background: rgba(168, 130, 255, 0.05) !important;
-                border: 1px solid var(--accent) !important;
-                color: var(--accent) !important;
-            }
-            .theme-matrix .sidebar {
-                border-right: 2px solid var(--border) !important;
-                box-shadow: 5px 0 20px rgba(168, 130, 255, 0.1) !important;
-            }
-            .theme-matrix * {
-                font-family: var(--font-mono) !important;
-            }
-            .theme-matrix .titlebar-title {
-                color: var(--accent) !important;
-                text-shadow: 0 0 5px var(--accent-glow);
-            }
-            .theme-matrix .config-item.selected {
-                border-left: 4px solid var(--accent) !important;
-                background: rgba(168, 130, 255, 0.1) !important;
-                box-shadow: inset 2px 0 15px rgba(168, 130, 255, 0.15) !important;
-            }
-            body.theme-matrix:not(.light-theme) .config-item .flag-name {
-                color: #fff !important;
-                font-weight: 700;
-                text-shadow: 0 0 5px rgba(168, 130, 255, 0.5);
-            }
-            body.theme-matrix:not(.light-theme) .config-item .flag-value {
-                color: #c4b5fd !important;
-                opacity: 1 !important;
-                font-weight: 800;
-                text-shadow: 0 0 8px rgba(168, 130, 255, 0.3);
-            }
-            body.theme-matrix:not(.light-theme) .config-item .flag-type {
-                background: rgba(168, 130, 255, 0.2) !important;
-                color: #fff !important;
-                border: 1px solid rgba(168, 130, 255, 0.4);
-                font-weight: 900;
-            }
-            body.theme-matrix:not(.light-theme) .config-item:hover {
-                background: rgba(168, 130, 255, 0.05) !important;
-            }
-
-            body.theme-matrix:not(.light-theme) .titlebar-version {
-                color: #fff !important;
-                font-weight: 800;
-                text-shadow: 0 0 8px var(--accent);
-                opacity: 1;
-            }
-            body.theme-matrix:not(.light-theme) .tab-btn {
-                color: #c4b5fd !important;
-                opacity: 0.7;
-                font-weight: 700;
-            }
-            body.theme-matrix:not(.light-theme) .tab-btn.active {
-                color: #fff !important;
-                opacity: 1;
-                text-shadow: 0 0 10px var(--accent);
-            }
-            body.theme-matrix:not(.light-theme) .tab-dot {
-                background: #003b00 !important;
-                box-shadow: inset 0 0 3px #000;
-            }
-            body.theme-matrix:not(.light-theme) .tab-btn.active .tab-dot {
-                background: #fff !important;
-                box-shadow: 0 0 8px var(--accent);
-            }
-            body.theme-matrix:not(.light-theme) .tab-bar {
-                background: rgba(1, 10, 2, 0.95) !important;
-                border-bottom: 1px solid var(--accent);
-            }
-            .theme-matrix ::-webkit-scrollbar-thumb {
-                background: var(--accent) !important;
-                border-radius: 0 !important;
-            }
-            #matrix-canvas {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100vw;
-                height: 100vh;
-                z-index: -1;
-                pointer-events: none;
-                display: none;
-            }
-            body.theme-matrix #matrix-canvas {
-                display: block;
-            }
-
-            /* === MATRIX LIGHT THEME OVERRIDES === */
-            body.theme-matrix.light-theme {
-                background: #ffffff !important;
-                --bg-base: rgba(255, 255, 255, 0.4);
-                --bg-sidebar: rgba(245, 245, 245, 0.85);
-                --bg-panel: rgba(240, 240, 240, 0.85);
-                --bg-card: rgba(235, 235, 235, 0.85);
-                --bg-elevated: rgba(225, 225, 225, 0.9);
-                --bg-hover: rgba(0, 0, 0, 0.05);
-                --bg-input: rgba(255, 255, 255, 0.9);
-                --bg-selected: rgba(0, 0, 0, 0.1);
-                --border: #000000;
-                --border-light: #444444;
-                --text: #000000;
-                --text-dim: #333333;
-                --text-dark: #666666;
-                --accent: #000000;
-                --accent-hover: #222222;
-                --accent-dim: #444444;
-                --accent-glow: rgba(0, 0, 0, 0.1);
-                --purple: #000000;
-                --purple-hover: #111111;
-                --success: #008f11;
-                --error: #cc0000;
-            }
-            body.theme-matrix.light-theme::before {
-                background: repeating-linear-gradient(
-                    0deg,
-                    rgba(0, 0, 0, 0.03),
-                    rgba(0, 0, 0, 0.03) 1px,
-                    transparent 1px,
-                    transparent 2px
-                );
-            }
-            body.theme-matrix.light-theme .btn-primary {
-                background: rgba(0, 0, 0, 0.05) !important;
-                border: 1px solid #000 !important;
-                color: #000 !important;
-                text-shadow: none !important;
-                box-shadow: none !important;
-            }
-            body.theme-matrix.light-theme .btn-primary:hover:not(:disabled) {
-                background: #000 !important;
-                color: #fff !important;
-            }
-            body.theme-matrix.light-theme .titlebar-title {
-                text-shadow: none !important;
-            }
-            body.theme-matrix.light-theme .config-item.selected {
-                box-shadow: inset 2px 0 10px rgba(0, 0, 0, 0.05) !important;
-            }
-            body.theme-matrix.light-theme .titlebar-icon {
-                background: #ffffff !important;
-                color: #000000 !important;
-                border: 1px solid #000000;
-            }
-
-            /* === CHERRY BLOSSOM THEME (soft pastel sakura) ===
-               A light, kawaii-pink theme. Placed after every other theme block
-               so it wins by source order if the Light Mode class lingers. Status
-               colors (--success/--warning/--error) are intentionally NOT
-               overridden, so the version/indicator dots stay green/amber/red. */
-            .theme-cherry {
-                --bg-base: #fff0f6;
-                --bg-sidebar: #ffe1ee;
-                --bg-panel: #fff6fa;
-                --bg-card: #ffeaf3;
-                --bg-elevated: #ffdcec;
-                --bg-hover: rgba(255, 130, 190, 0.12);
-                --bg-input: #fffafc;
-                --bg-selected: rgba(255, 130, 190, 0.18);
-                --border: #ffc4dd;
-                --border-light: #ffb2d2;
-                --text: #6e2a48;
-                --text-dim: #a85d7e;
-                --text-dark: #cf93ae;
-                --accent: #ff6fb5;
-                --accent-hover: #ff8ec8;
-                --accent-dim: #e85ba0;
-                --accent-glow: rgba(255, 111, 181, 0.35);
-                --purple: #b57edc;
-                --purple-hover: #c79bea;
-                --radius: 12px;
-                --radius-lg: 16px;
-            }
-            body.theme-cherry {
-                background: linear-gradient(
-                    160deg,
-                    #fff5fa 0%,
-                    #ffe7f2 45%,
-                    #ffdcee 100%
-                ) !important;
-            }
-            /* Falling-petals canvas. Sits above the pink backdrop but behind the
-               UI; only painted when the theme is active AND petals are enabled. */
-            #petals-canvas {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100vw;
-                height: 100vh;
-                z-index: -1;
-                pointer-events: none;
-                display: none;
-            }
-            body.theme-cherry.petals-on #petals-canvas {
-                display: block;
-            }
-            /* Cute, soft pink primary buttons + gentle glow. */
-            .theme-cherry .btn-primary {
-                background: linear-gradient(
-                    135deg,
-                    var(--accent),
-                    var(--accent-hover)
-                ) !important;
-                color: #fff !important;
-                border: none !important;
-                box-shadow: 0 4px 14px var(--accent-glow) !important;
-            }
-            .theme-cherry .btn-primary:hover:not(:disabled) {
-                box-shadow: 0 6px 22px var(--accent-glow) !important;
-            }
-            .theme-cherry .titlebar-icon {
-                color: #fff !important;
-                box-shadow: 0 0 10px var(--accent-glow);
-            }
-            .theme-cherry .config-item.selected {
-                border-left: 3px solid var(--accent) !important;
-            }
-            .theme-cherry ::-webkit-scrollbar-thumb {
-                background: var(--accent) !important;
-            }
-            /* Recolor the loading-screen logo (hardcoded green) to pink. */
-            .theme-cherry .loader-logo {
-                background: var(--accent) !important;
-                color: #fff !important;
-                box-shadow: 0 0 30px var(--accent-glow) !important;
-            }
-
-            /* === Studio (graphite DAW) ===
-               Mid-grey chassis. Orange is a clip marker, not a fill.
-               Strictly dark â€” Light Mode is hidden while this theme is on. */
-            .theme-studio {
-                --bg-base: #1a1a1a;
-                --bg-sidebar: #222222;
-                --bg-panel: #252525;
-                --bg-card: #2c2c2c;
-                --bg-elevated: #333333;
-                --bg-hover: rgba(255, 118, 77, 0.1);
-                --bg-input: #1c1c1c;
-                --bg-selected: rgba(255, 118, 77, 0.16);
-                --border: #3a3a3a;
-                --border-light: #4a4a4a;
-                --text: #d4d4d4;
-                --text-dim: #8e8e8e;
-                --text-dark: #5c5c5c;
-                --accent: #ff764d;
-                --accent-hover: #ff8d6a;
-                --accent-dim: #c85a38;
-                --accent-glow: rgba(255, 118, 77, 0.18);
-                --purple: #6ea8ff;
-                --purple-hover: #8cbcff;
-                --success: #8fd16a;
-                --error: #e85d5d;
-                --warning: #e0b04a;
-                --btn-ink: #1a1a1a;
-                --font-ui: "FFM Inter", "Segoe UI", sans-serif;
-                --font-display: "FFM Inter", "Segoe UI", sans-serif;
-                --font-mono: "FFM Plex Mono", "Cascadia Code", Consolas, monospace;
-                --radius: 3px;
-                --radius-lg: 4px;
-            }
-            body.theme-studio {
-                background: #1a1a1a !important;
-            }
-            .theme-studio .btn {
-                box-shadow: none;
-            }
-            .theme-studio .btn-primary {
-                background: var(--accent) !important;
-                color: var(--btn-ink) !important;
-                box-shadow: none !important;
-            }
-            .theme-studio .titlebar-icon {
-                border-radius: 2px;
-                color: var(--btn-ink) !important;
-            }
-            .theme-studio .config-item.selected {
-                box-shadow: inset 3px 0 0 var(--accent) !important;
-                border-left-color: transparent !important;
-            }
-            .theme-studio ::-webkit-scrollbar-thumb {
-                background: #4a4a4a !important;
-            }
-            .theme-studio .loader-logo {
-                background: var(--accent) !important;
-                color: var(--btn-ink) !important;
-            }
-
-            /* === Nocturne (OLED editorial) ===
-               True black, champagne gold, Syne wordmark.
-               Strictly dark â€” Light Mode is hidden while this theme is on. */
-            .theme-nocturne {
-                --bg-base: #050505;
-                --bg-sidebar: #090909;
-                --bg-panel: #0c0c0c;
-                --bg-card: #111111;
-                --bg-elevated: #161616;
-                --bg-hover: rgba(201, 169, 98, 0.08);
-                --bg-input: #080808;
-                --bg-selected: rgba(201, 169, 98, 0.12);
-                --border: rgba(201, 169, 98, 0.16);
-                --border-light: rgba(201, 169, 98, 0.28);
-                --text: #f3ede0;
-                --text-dim: #a89b84;
-                --text-dark: #6a6256;
-                --accent: #c9a962;
-                --accent-hover: #e0c178;
-                --accent-dim: #9a7d3e;
-                --accent-glow: rgba(201, 169, 98, 0.22);
-                --purple: #c9a962;
-                --purple-hover: #e0c178;
-                --success: #b7c99a;
-                --error: #d46a5c;
-                --warning: #c9a962;
-                --btn-ink: #0a0906;
-                --font-ui: "FFM Inter", "Segoe UI", sans-serif;
-                --font-display: "FFM Syne", "Segoe UI", sans-serif;
-                --font-mono: "FFM Plex Mono", "Cascadia Code", Consolas, monospace;
-                --radius: 0px;
-                --radius-lg: 0px;
-                --title-weight: 800;
-                --title-track: 0.16em;
-            }
-            body.theme-nocturne {
-                background:
-                    radial-gradient(
-                        ellipse at 50% -20%,
-                        rgba(201, 169, 98, 0.14),
-                        transparent 52%
-                    ),
-                    #050505 !important;
-            }
-            body.theme-nocturne::after {
-                content: "";
-                position: fixed;
-                inset: 0;
-                pointer-events: none;
-                z-index: 40;
-                opacity: 0.06;
-                mix-blend-mode: overlay;
-                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-            }
-            .theme-nocturne .titlebar {
-                border-bottom-color: var(--accent);
-            }
-            .theme-nocturne .titlebar-title {
-                text-transform: uppercase;
-                color: var(--accent);
-            }
-            .theme-nocturne .titlebar-icon {
-                border-radius: 0;
-                color: var(--btn-ink) !important;
-            }
-            .theme-nocturne .config-title {
-                font-family: "FFM Instrument Serif", Georgia, serif;
-                font-size: 18px;
-                font-weight: 400;
-                letter-spacing: 0;
-            }
-            .theme-nocturne .btn {
-                letter-spacing: 0.08em;
-                text-transform: uppercase;
-                font-size: 10px;
-                box-shadow: none;
-            }
-            .theme-nocturne .btn-primary {
-                background: transparent !important;
-                color: var(--accent) !important;
-                border: 1px solid var(--accent) !important;
-                box-shadow: none !important;
-            }
-            .theme-nocturne .btn-primary:hover:not(:disabled) {
-                background: var(--accent) !important;
-                color: var(--btn-ink) !important;
-            }
-            .theme-nocturne .btn-secondary {
-                color: var(--btn-ink) !important;
-            }
-            .theme-nocturne .config-item.selected {
-                box-shadow: none !important;
-                border-left-width: 3px !important;
-            }
-            .theme-nocturne .config-count {
-                border-radius: 0;
-            }
-            .theme-nocturne ::-webkit-scrollbar-thumb {
-                background: var(--accent-dim) !important;
-                border-radius: 0 !important;
-            }
-            .theme-nocturne .loader-logo {
-                background: var(--accent) !important;
-                color: var(--btn-ink) !important;
-                border-radius: 0 !important;
-            }
-
-            /* === Mocha (Catppuccin glass) ===
-               Mauve accent, peach values, soft radii.
-               Strictly dark â€” Light Mode is hidden while this theme is on. */
-            .theme-mocha {
-                --bg-base: #11111b;
-                --bg-sidebar: rgba(24, 24, 37, 0.88);
-                --bg-panel: rgba(30, 30, 46, 0.82);
-                --bg-card: #313244;
-                --bg-elevated: #45475a;
-                --bg-hover: rgba(203, 166, 247, 0.12);
-                --bg-input: #181825;
-                --bg-selected: rgba(203, 166, 247, 0.16);
-                --border: #313244;
-                --border-light: #45475a;
-                --text: #cdd6f4;
-                --text-dim: #a6adc8;
-                --text-dark: #6c7086;
-                --accent: #cba6f7;
-                --accent-hover: #d4b5fa;
-                --accent-dim: #b4befe;
-                --accent-glow: rgba(203, 166, 247, 0.28);
-                --purple: #89b4fa;
-                --purple-hover: #b4befe;
-                --success: #a6e3a1;
-                --error: #f38ba8;
-                --warning: #f9e2af;
-                --btn-ink: #11111b;
-                --font-ui: "FFM Jakarta", "Segoe UI", sans-serif;
-                --font-display: "FFM Jakarta", "Segoe UI", sans-serif;
-                --font-mono: "FFM Plex Mono", "Cascadia Code", Consolas, monospace;
-                --radius: 10px;
-                --radius-lg: 14px;
-            }
-            body.theme-mocha {
-                background:
-                    radial-gradient(
-                        ellipse at 0% 0%,
-                        rgba(203, 166, 247, 0.16),
-                        transparent 40%
-                    ),
-                    radial-gradient(
-                        ellipse at 100% 100%,
-                        rgba(250, 179, 135, 0.1),
-                        transparent 42%
-                    ),
-                    #11111b !important;
-            }
-            .theme-mocha .titlebar-icon {
-                border-radius: 6px;
-                color: var(--btn-ink) !important;
-            }
-            .theme-mocha .btn-primary {
-                background: linear-gradient(180deg, #d4b5fa, #cba6f7) !important;
-                color: var(--btn-ink) !important;
-                box-shadow: 0 4px 14px var(--accent-glow) !important;
-            }
-            .theme-mocha .config-item .flag-value {
-                color: #fab387;
-            }
-            .theme-mocha .sidebar {
-                backdrop-filter: blur(18px);
-                -webkit-backdrop-filter: blur(18px);
-            }
-            .theme-mocha ::-webkit-scrollbar-thumb {
-                background: #585b70 !important;
-            }
-            .theme-mocha .loader-logo {
-                background: var(--accent) !important;
-                color: var(--btn-ink) !important;
-            }
-
-            /* === Vellum (paper folio) ===
-               Warm cream, ink, terracotta. A real light theme, not inverted dark.
-               Strictly light â€” Light Mode is hidden while this theme is on. */
-            .theme-vellum {
-                --bg-base: #f3eee4;
-                --bg-sidebar: #e8e1d4;
-                --bg-panel: #f7f3ea;
-                --bg-card: #efe8da;
-                --bg-elevated: #e4dccb;
-                --bg-hover: rgba(184, 92, 56, 0.08);
-                --bg-input: #fbf8f1;
-                --bg-selected: rgba(184, 92, 56, 0.12);
-                --border: #d4cbb8;
-                --border-light: #c4b9a2;
-                --text: #1c1916;
-                --text-dim: #6b6358;
-                --text-dark: #9a9184;
-                --accent: #b85c38;
-                --accent-hover: #c96b46;
-                --accent-dim: #8e4629;
-                --accent-glow: rgba(184, 92, 56, 0.16);
-                --purple: #3d5a4a;
-                --purple-hover: #4d6e5c;
-                --success: #3d6b4f;
-                --error: #b04040;
-                --warning: #b8862a;
-                --btn-ink: #f7f3ea;
-                --font-ui: "FFM Source Sans", "Segoe UI", sans-serif;
-                --font-display: "FFM Newsreader", Georgia, serif;
-                --font-mono: "FFM Plex Mono", "Cascadia Code", Consolas, monospace;
-                --radius: 4px;
-                --radius-lg: 6px;
-                --title-weight: 600;
-                --title-track: 0.02em;
-            }
-            body.theme-vellum {
-                background:
-                    radial-gradient(
-                        ellipse at 80% 0%,
-                        rgba(184, 92, 56, 0.06),
-                        transparent 44%
-                    ),
-                    #f3eee4 !important;
-            }
-            body.theme-vellum::after {
-                content: "";
-                position: fixed;
-                inset: 0;
-                pointer-events: none;
-                z-index: 40;
-                opacity: 0.07;
-                mix-blend-mode: multiply;
-                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-            }
-            .theme-vellum .titlebar-title {
-                font-size: 14px;
-                color: var(--text);
-                letter-spacing: 0;
-            }
-            .theme-vellum .config-title {
-                font-size: 16px;
-            }
-            .theme-vellum .titlebar-icon {
-                color: var(--btn-ink) !important;
-            }
-            .theme-vellum .btn {
-                box-shadow:
-                    0 1px 0 rgba(255, 255, 255, 0.6) inset,
-                    0 1px 2px rgba(80, 50, 20, 0.08);
-            }
-            .theme-vellum .btn-primary {
-                background: var(--accent) !important;
-                color: var(--btn-ink) !important;
-            }
-            .theme-vellum .btn-subtle:hover:not(:disabled) {
-                color: var(--text);
-            }
-            .theme-vellum .config-item.selected {
-                box-shadow: none !important;
-                border-left: 3px solid var(--accent) !important;
-            }
-            .theme-vellum ::-webkit-scrollbar-thumb {
-                background: #c4b9a2 !important;
-            }
-            .theme-vellum .loader-logo {
-                background: var(--accent) !important;
-                color: var(--btn-ink) !important;
-            }
-            .theme-vellum .flags-pill.off {
-                background: rgba(28, 25, 22, 0.06);
-                border-color: var(--border);
-                color: var(--text-dim);
-            }
-
-            /* === Aurora ===
-               Polar night + glacier. Falling-light canvas, same idea as petals. */
-            .theme-aurora {
-                --bg-base: #061018;
-                --bg-sidebar: rgba(8, 18, 28, 0.72);
-                --bg-panel: rgba(10, 22, 34, 0.7);
-                --bg-card: rgba(14, 30, 44, 0.82);
-                --bg-elevated: rgba(18, 38, 54, 0.9);
-                --bg-hover: rgba(94, 234, 212, 0.1);
-                --bg-input: rgba(6, 16, 24, 0.85);
-                --bg-selected: rgba(94, 234, 212, 0.14);
-                --border: rgba(125, 211, 252, 0.12);
-                --border-light: rgba(94, 234, 212, 0.28);
-                --text: #e8f4f2;
-                --text-dim: #8ba8b0;
-                --text-dark: #4d6a74;
-                --accent: #5eead4;
-                --accent-hover: #99f6e4;
-                --accent-dim: #2dd4bf;
-                --accent-glow: rgba(94, 234, 212, 0.32);
-                --purple: #7dd3c7;
-                --purple-hover: #99f6e4;
-                --success: #6ee7b7;
-                --error: #fb7185;
-                --warning: #fde68a;
-                --btn-ink: #04201a;
-                --font-ui: "FFM Space Grotesk", "Segoe UI", sans-serif;
-                --font-display: "FFM Space Grotesk", "Segoe UI", sans-serif;
-                --font-mono: "FFM Plex Mono", "Cascadia Code", Consolas, monospace;
-                --radius: 10px;
-                --radius-lg: 14px;
-                --title-weight: 600;
-                --title-track: 0.04em;
-            }
-            body.theme-aurora {
-                background: #061018 !important;
-            }
-            body.theme-aurora.light-theme {
-                --bg-base: #eef5f8;
-                --bg-sidebar: rgba(255, 255, 255, 0.78);
-                --bg-panel: rgba(255, 255, 255, 0.82);
-                --bg-card: #f7fbfc;
-                --bg-elevated: #e7eef2;
-                --bg-hover: rgba(13, 148, 136, 0.08);
-                --bg-input: #ffffff;
-                --bg-selected: rgba(13, 148, 136, 0.12);
-                --border: #c9d9e0;
-                --border-light: #b7c9d2;
-                --text: #0c1922;
-                --text-dim: #4a6570;
-                --text-dark: #7a929c;
-                --accent: #0f766e;
-                --accent-hover: #0d9488;
-                --accent-dim: #115e59;
-                --accent-glow: rgba(15, 118, 110, 0.18);
-                --purple: #0f766e;
-                --purple-hover: #0d9488;
-                --success: #047857;
-                --error: #be123c;
-                --warning: #b45309;
-                --btn-ink: #f4fffd;
-                background: #eef5f8 !important;
-            }
-            .theme-aurora .btn-primary {
-                background: var(--accent) !important;
-                color: var(--btn-ink) !important;
-            }
-            .theme-aurora .titlebar-icon {
-                color: var(--btn-ink) !important;
-            }
-            .theme-aurora .config-item.selected {
-                box-shadow: inset 3px 0 0 var(--accent) !important;
-            }
-            .theme-aurora .loader-logo {
-                background: var(--accent) !important;
-                color: var(--btn-ink) !important;
-            }
-
-            /* === Neko ===
-               Cat cafe. Falling cats on the canvas, same idea as petals. */
-            .theme-neko {
-                --bg-base: #16110e;
-                --bg-sidebar: rgba(32, 24, 20, 0.74);
-                --bg-panel: rgba(38, 28, 24, 0.72);
-                --bg-card: rgba(48, 36, 30, 0.86);
-                --bg-elevated: rgba(58, 44, 36, 0.92);
-                --bg-hover: rgba(224, 154, 106, 0.12);
-                --bg-input: rgba(18, 14, 12, 0.9);
-                --bg-selected: rgba(224, 154, 106, 0.16);
-                --border: rgba(224, 154, 106, 0.18);
-                --border-light: rgba(224, 154, 106, 0.3);
-                --text: #f3e6d8;
-                --text-dim: #b89a86;
-                --text-dark: #7a6254;
-                --accent: #e09a6a;
-                --accent-hover: #f0b489;
-                --accent-dim: #c47a4e;
-                --accent-glow: rgba(224, 154, 106, 0.28);
-                --purple: #c47a4e;
-                --purple-hover: #d4895c;
-                --success: #8fbf7a;
-                --error: #e07070;
-                --warning: #e0b04a;
-                --btn-ink: #1a120e;
-                --font-ui: "FFM Outfit", "Segoe UI", sans-serif;
-                --font-display: "FFM Outfit", "Segoe UI", sans-serif;
-                --font-mono: "FFM Plex Mono", "Cascadia Code", Consolas, monospace;
-                --radius: 10px;
-                --radius-lg: 14px;
-                --title-weight: 700;
-                --title-track: 0.02em;
-            }
-            body.theme-neko {
-                background: #16110e !important;
-            }
-            body.theme-neko.light-theme {
-                --bg-base: #f4f2f0;
-                --bg-sidebar: rgba(255, 255, 255, 0.84);
-                --bg-panel: rgba(255, 255, 255, 0.88);
-                --bg-card: #fffcfa;
-                --bg-elevated: #ece8e4;
-                --bg-hover: rgba(224, 122, 95, 0.1);
-                --bg-input: #ffffff;
-                --bg-selected: rgba(224, 122, 95, 0.12);
-                --border: #ddd6d0;
-                --border-light: #cfc6bf;
-                --text: #221c18;
-                --text-dim: #6a5e56;
-                --text-dark: #978a82;
-                --accent: #e07a5f;
-                --accent-hover: #ec8b70;
-                --accent-dim: #c45c38;
-                --accent-glow: rgba(224, 122, 95, 0.18);
-                --purple: #c45c38;
-                --purple-hover: #d46a46;
-                --success: #4d7c3e;
-                --error: #b04040;
-                --warning: #b8862a;
-                --btn-ink: #fff8f4;
-                background: #f4f2f0 !important;
-            }
-            .theme-neko .btn-primary {
-                background: var(--accent) !important;
-                color: var(--btn-ink) !important;
-            }
-            .theme-neko .titlebar-icon {
-                color: var(--btn-ink) !important;
-            }
-            .theme-neko .config-item.selected {
-                box-shadow: inset 3px 0 0 var(--accent) !important;
-            }
-            .theme-neko .loader-logo {
-                background: var(--accent) !important;
-                color: var(--btn-ink) !important;
-            }
-
-            #aurora-canvas,
-            #neko-canvas {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100vw;
-                height: 100vh;
-                z-index: -1;
-                pointer-events: none;
-                display: none;
-            }
-            body.theme-aurora #aurora-canvas,
-            body.theme-neko #neko-canvas {
-                display: block;
-            }
+            
 
             body {
                 font-family: var(--font-ui);
@@ -2156,20 +1129,7 @@
                 box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
                 overflow: hidden;
             }
-            .preset-matrix-canvas {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                z-index: 0;
-                pointer-events: none;
-                opacity: 0;
-                transition: opacity 0.5s ease;
-            }
-            body.theme-matrix .preset-matrix-canvas {
-                opacity: 0.25;
-            }
+            
             .preset-card::before {
                 content: "";
                 position: absolute;
@@ -2468,40 +1428,6 @@
                 opacity: 1;
             }
 
-            body.theme-matrix.light-theme .preset-btn-select {
-                color: #000 !important;
-                background: rgba(0, 0, 0, 0.05) !important;
-                border: 1px solid #000 !important;
-                box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.05);
-                border-radius: 0 !important;
-                font-weight: 800;
-                padding: 5px 12px !important;
-                font-size: 11px !important;
-                letter-spacing: 0.5px !important;
-            }
-            body.theme-matrix.light-theme .preset-btn-select:hover {
-                background: #000 !important;
-                color: #fff !important;
-                transform: translate(-1px, -1px);
-                box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.15);
-            }
-            body.theme-matrix.light-theme .preset-add-card {
-                border: 1px solid #000 !important;
-                background: rgba(0, 0, 0, 0.02) !important;
-                border-radius: 0 !important;
-            }
-            body.theme-matrix.light-theme .preset-settings-btn {
-                background: rgba(0, 0, 0, 0.03) !important;
-                border: 1px solid #000 !important;
-                color: #000 !important;
-                border-radius: 0 !important;
-                width: 26px !important;
-                height: 26px !important;
-            }
-            body.theme-matrix.light-theme .preset-settings-btn:hover {
-                background: #000 !important;
-                color: #fff !important;
-            }
             .preset-btn-select:active {
                 transform: translateY(0) scale(0.96);
             }
@@ -2531,29 +1457,6 @@
             }
             .preset-settings-btn:active {
                 transform: translateY(0);
-            }
-
-            /* Matrix Theme Text Visibility Overrides */
-            body.theme-matrix:not(.light-theme) .preset-card .preset-title {
-                font-weight: 900;
-                color: #fff;
-                text-shadow: 0 0 8px var(--accent);
-            }
-            body.theme-matrix:not(.light-theme) .preset-card .preset-stat-item {
-                color: #c4b5fd;
-                font-weight: 700;
-            }
-            body.theme-matrix:not(.light-theme) .preset-card .preset-date {
-                color: #c4b5fd;
-                font-weight: 800;
-                opacity: 0.9;
-            }
-            body.theme-matrix:not(.light-theme)
-                .preset-card
-                .preset-stat-item
-                i {
-                color: #fff !important;
-                text-shadow: 0 0 5px #c4b5fd;
             }
 
             /* Big "+" card */
@@ -3417,6 +2320,533 @@
                 box-shadow: none;
                 margin: 0;
                 border-radius: 0;
+            }
+
+
+            /* === Cyberpunk Theme (Neon Grid) ===
+               Magenta/cyan neon grid with scanlines. Strictly dark. */
+            .theme-cyberpunk {
+                --bg-base: #0a0014;
+                --bg-sidebar: rgba(20, 0, 40, 0.85);
+                --bg-panel: rgba(28, 4, 56, 0.8);
+                --bg-card: rgba(40, 8, 80, 0.75);
+                --bg-elevated: rgba(56, 12, 112, 0.9);
+                --bg-hover: rgba(255, 0, 200, 0.12);
+                --bg-input: rgba(16, 2, 32, 0.9);
+                --bg-selected: rgba(255, 0, 200, 0.18);
+                --border: rgba(255, 0, 200, 0.25);
+                --border-light: rgba(0, 255, 255, 0.3);
+                --text: #f0e6ff;
+                --text-dim: #b388ff;
+                --text-dark: #6a4a9a;
+                --accent: #ff00ea;
+                --accent-hover: #ff44ff;
+                --accent-dim: #cc00bb;
+                --accent-glow: rgba(255, 0, 234, 0.45);
+                --purple: #00ffff;
+                --purple-hover: #44ffff;
+                --success: #00ff88;
+                --error: #ff0044;
+                --warning: #ffaa00;
+                --btn-ink: #0a0014;
+                --font-ui: "FFM Space Grotesk", "Segoe UI", sans-serif;
+                --font-display: "FFM Syne", "Segoe UI", sans-serif;
+                --font-mono: "FFM Plex Mono", "Cascadia Code", Consolas, monospace;
+                --radius: 2px;
+                --radius-lg: 4px;
+                --title-weight: 800;
+                --title-track: 0.08em;
+            }
+            body.theme-cyberpunk {
+                background: #0a0014 !important;
+            }
+            body.theme-cyberpunk::before {
+                content: "";
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: repeating-linear-gradient(
+                    0deg,
+                    rgba(255, 0, 234, 0.04),
+                    rgba(255, 0, 234, 0.04) 1px,
+                    transparent 1px,
+                    transparent 3px
+                );
+                pointer-events: none;
+                z-index: 9999;
+            }
+            .theme-cyberpunk .btn-primary {
+                background: linear-gradient(135deg, #ff00ea, #00ffff) !important;
+                color: #0a0014 !important;
+                border: 1px solid rgba(255, 0, 234, 0.5) !important;
+                box-shadow: 0 0 15px var(--accent-glow) !important;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                font-weight: 700;
+            }
+            .theme-cyberpunk .titlebar-title {
+                background: linear-gradient(90deg, #ff00ea, #00ffff);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+            }
+            .theme-cyberpunk .titlebar-icon {
+                background: linear-gradient(135deg, #ff00ea, #00ffff) !important;
+                box-shadow: 0 0 15px var(--accent-glow) !important;
+                border: 1px solid rgba(255, 0, 234, 0.4);
+            }
+            .theme-cyberpunk .config-item.selected {
+                border-left: 3px solid var(--accent) !important;
+                background: rgba(255, 0, 234, 0.08) !important;
+                box-shadow: inset 2px 0 15px rgba(255, 0, 234, 0.15) !important;
+            }
+            .theme-cyberpunk .sidebar {
+                border-right: 1px solid rgba(255, 0, 234, 0.2) !important;
+                box-shadow: 4px 0 30px rgba(255, 0, 234, 0.08) !important;
+            }
+            .theme-cyberpunk ::-webkit-scrollbar-thumb {
+                background: linear-gradient(180deg, #ff00ea, #00ffff) !important;
+                border-radius: 2px;
+            }
+            .theme-cyberpunk .loader-logo {
+                background: linear-gradient(135deg, #ff00ea, #00ffff) !important;
+                color: #0a0014 !important;
+            }
+            #cyberpunk-canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                z-index: -1;
+                pointer-events: none;
+                display: none;
+            }
+            body.theme-cyberpunk #cyberpunk-canvas {
+                display: block;
+            }
+
+            /* === Nebula Theme (Deep Space Starfield) ===
+               Purple/pink nebula clouds with drifting stars. Strictly dark. */
+            .theme-nebula {
+                --bg-base: #050015;
+                --bg-sidebar: rgba(12, 4, 32, 0.8);
+                --bg-panel: rgba(18, 8, 44, 0.75);
+                --bg-card: rgba(28, 14, 60, 0.7);
+                --bg-elevated: rgba(40, 22, 80, 0.85);
+                --bg-hover: rgba(180, 120, 255, 0.12);
+                --bg-input: rgba(10, 4, 24, 0.9);
+                --bg-selected: rgba(180, 120, 255, 0.18);
+                --border: rgba(180, 120, 255, 0.18);
+                --border-light: rgba(200, 150, 255, 0.28);
+                --text: #e8dfff;
+                --text-dim: #9a8acc;
+                --text-dark: #5a4a7a;
+                --accent: #b478ff;
+                --accent-hover: #c99aff;
+                --accent-dim: #8a5add;
+                --accent-glow: rgba(180, 120, 255, 0.35);
+                --purple: #ff6b9d;
+                --purple-hover: #ff8fb5;
+                --success: #7affc7;
+                --error: #ff5577;
+                --warning: #ffcc66;
+                --btn-ink: #050015;
+                --font-ui: "FFM Jakarta", "Segoe UI", sans-serif;
+                --font-display: "FFM Syne", "Segoe UI", sans-serif;
+                --font-mono: "FFM Plex Mono", "Cascadia Code", Consolas, monospace;
+                --radius: 12px;
+                --radius-lg: 16px;
+                --title-weight: 700;
+                --title-track: 0.04em;
+            }
+            body.theme-nebula {
+                background:
+                    radial-gradient(
+                        ellipse at 20% 30%,
+                        rgba(180, 120, 255, 0.12),
+                        transparent 50%
+                    ),
+                    radial-gradient(
+                        ellipse at 80% 70%,
+                        rgba(255, 107, 157, 0.08),
+                        transparent 45%
+                    ),
+                    #050015 !important;
+            }
+            .theme-nebula .btn-primary {
+                background: linear-gradient(135deg, #b478ff, #ff6b9d) !important;
+                color: #fff !important;
+                border: none !important;
+                box-shadow: 0 4px 18px var(--accent-glow) !important;
+            }
+            .theme-nebula .titlebar-icon {
+                background: linear-gradient(135deg, #b478ff, #ff6b9d) !important;
+                box-shadow: 0 0 12px var(--accent-glow) !important;
+            }
+            .theme-nebula .config-item.selected {
+                border-left: 3px solid var(--accent) !important;
+                background: rgba(180, 120, 255, 0.08) !important;
+            }
+            .theme-nebula .loader-logo {
+                background: linear-gradient(135deg, #b478ff, #ff6b9d) !important;
+                color: #fff !important;
+            }
+            #nebula-canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                z-index: -1;
+                pointer-events: none;
+                display: none;
+            }
+            body.theme-nebula #nebula-canvas {
+                display: block;
+            }
+
+            /* === Synthwave Theme (Sunset Grid) ===
+               80s sunset with horizon grid. Orange/pink/purple. Strictly dark. */
+            .theme-synthwave {
+                --bg-base: #1a0530;
+                --bg-sidebar: rgba(40, 10, 60, 0.85);
+                --bg-panel: rgba(50, 14, 70, 0.8);
+                --bg-card: rgba(65, 20, 90, 0.75);
+                --bg-elevated: rgba(85, 30, 115, 0.9);
+                --bg-hover: rgba(255, 100, 200, 0.12);
+                --bg-input: rgba(30, 8, 50, 0.9);
+                --bg-selected: rgba(255, 100, 200, 0.18);
+                --border: rgba(255, 100, 200, 0.2);
+                --border-light: rgba(255, 150, 100, 0.28);
+                --text: #ffe0f0;
+                --text-dim: #d090c0;
+                --text-dark: #806080;
+                --accent: #ff64c8;
+                --accent-hover: #ff8ad8;
+                --accent-dim: #cc4a9a;
+                --accent-glow: rgba(255, 100, 200, 0.4);
+                --purple: #ffaa44;
+                --purple-hover: #ffbb66;
+                --success: #44ffaa;
+                --error: #ff4466;
+                --warning: #ffaa44;
+                --btn-ink: #1a0530;
+                --font-ui: "FFM Outfit", "Segoe UI", sans-serif;
+                --font-display: "FFM Syne", "Segoe UI", sans-serif;
+                --font-mono: "FFM Plex Mono", "Cascadia Code", Consolas, monospace;
+                --radius: 6px;
+                --radius-lg: 10px;
+                --title-weight: 800;
+                --title-track: 0.06em;
+            }
+            body.theme-synthwave {
+                background:
+                    linear-gradient(
+                        180deg,
+                        #2a0850 0%,
+                        #1a0530 50%,
+                        #0d0220 100%
+                    ) !important;
+            }
+            .theme-synthwave .btn-primary {
+                background: linear-gradient(135deg, #ff64c8, #ffaa44) !important;
+                color: #1a0530 !important;
+                border: 1px solid rgba(255, 100, 200, 0.4) !important;
+                box-shadow: 0 4px 18px var(--accent-glow) !important;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            .theme-synthwave .titlebar-title {
+                background: linear-gradient(90deg, #ff64c8, #ffaa44);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                text-transform: uppercase;
+            }
+            .theme-synthwave .titlebar-icon {
+                background: linear-gradient(135deg, #ff64c8, #ffaa44) !important;
+                box-shadow: 0 0 12px var(--accent-glow) !important;
+            }
+            .theme-synthwave .config-item.selected {
+                border-left: 3px solid var(--accent) !important;
+                background: rgba(255, 100, 200, 0.08) !important;
+            }
+            .theme-synthwave ::-webkit-scrollbar-thumb {
+                background: linear-gradient(180deg, #ff64c8, #ffaa44) !important;
+            }
+            .theme-synthwave .loader-logo {
+                background: linear-gradient(135deg, #ff64c8, #ffaa44) !important;
+                color: #1a0530 !important;
+            }
+            #synthwave-canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                z-index: -1;
+                pointer-events: none;
+                display: none;
+            }
+            body.theme-synthwave #synthwave-canvas {
+                display: block;
+            }
+
+            /* === Ember Theme (Volcanic) ===
+               Dark volcanic with rising embers. Red/orange. Strictly dark. */
+            .theme-ember {
+                --bg-base: #100200;
+                --bg-sidebar: rgba(30, 6, 4, 0.85);
+                --bg-panel: rgba(40, 10, 6, 0.8);
+                --bg-card: rgba(55, 16, 10, 0.75);
+                --bg-elevated: rgba(75, 24, 14, 0.9);
+                --bg-hover: rgba(255, 80, 20, 0.12);
+                --bg-input: rgba(20, 4, 2, 0.9);
+                --bg-selected: rgba(255, 80, 20, 0.18);
+                --border: rgba(255, 80, 20, 0.2);
+                --border-light: rgba(255, 120, 40, 0.3);
+                --text: #ffe0d0;
+                --text-dim: #cc8870;
+                --text-dark: #804030;
+                --accent: #ff5010;
+                --accent-hover: #ff7030;
+                --accent-dim: #cc3808;
+                --accent-glow: rgba(255, 80, 16, 0.4);
+                --purple: #ffaa20;
+                --purple-hover: #ffbb40;
+                --success: #50ff80;
+                --error: #ff2040;
+                --warning: #ffaa20;
+                --btn-ink: #100200;
+                --font-ui: "FFM Inter", "Segoe UI", sans-serif;
+                --font-display: "FFM Syne", "Segoe UI", sans-serif;
+                --font-mono: "FFM Plex Mono", "Cascadia Code", Consolas, monospace;
+                --radius: 8px;
+                --radius-lg: 12px;
+                --title-weight: 700;
+                --title-track: 0.04em;
+            }
+            body.theme-ember {
+                background:
+                    radial-gradient(
+                        ellipse at 50% 100%,
+                        rgba(255, 80, 16, 0.15),
+                        transparent 60%
+                    ),
+                    #100200 !important;
+            }
+            .theme-ember .btn-primary {
+                background: linear-gradient(135deg, #ff5010, #ffaa20) !important;
+                color: #100200 !important;
+                border: 1px solid rgba(255, 80, 16, 0.4) !important;
+                box-shadow: 0 4px 15px var(--accent-glow) !important;
+            }
+            .theme-ember .titlebar-title {
+                background: linear-gradient(90deg, #ff5010, #ffaa20);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+            .theme-ember .titlebar-icon {
+                background: linear-gradient(135deg, #ff5010, #ffaa20) !important;
+                box-shadow: 0 0 12px var(--accent-glow) !important;
+            }
+            .theme-ember .config-item.selected {
+                border-left: 3px solid var(--accent) !important;
+                background: rgba(255, 80, 16, 0.08) !important;
+            }
+            .theme-ember ::-webkit-scrollbar-thumb {
+                background: linear-gradient(180deg, #ff5010, #ffaa20) !important;
+            }
+            .theme-ember .loader-logo {
+                background: linear-gradient(135deg, #ff5010, #ffaa20) !important;
+                color: #100200 !important;
+            }
+            #ember-canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                z-index: -1;
+                pointer-events: none;
+                display: none;
+            }
+            body.theme-ember #ember-canvas {
+                display: block;
+            }
+
+            /* === Abyss Theme (Bioluminescent) ===
+               Deep ocean with glowing particles. Teal/blue. Strictly dark. */
+            .theme-abyss {
+                --bg-base: #001218;
+                --bg-sidebar: rgba(0, 24, 36, 0.85);
+                --bg-panel: rgba(0, 30, 44, 0.8);
+                --bg-card: rgba(0, 40, 56, 0.75);
+                --bg-elevated: rgba(0, 52, 72, 0.9);
+                --bg-hover: rgba(0, 220, 200, 0.12);
+                --bg-input: rgba(0, 18, 28, 0.9);
+                --bg-selected: rgba(0, 220, 200, 0.18);
+                --border: rgba(0, 200, 180, 0.2);
+                --border-light: rgba(0, 240, 220, 0.3);
+                --text: #d0f8f0;
+                --text-dim: #70b0a8;
+                --text-dark: #306060;
+                --accent: #00dcc8;
+                --accent-hover: #20f0dc;
+                --accent-dim: #00a898;
+                --accent-glow: rgba(0, 220, 200, 0.4);
+                --purple: #4488ff;
+                --purple-hover: #66aaff;
+                --success: #00ff88;
+                --error: #ff4466;
+                --warning: #ffcc44;
+                --btn-ink: #001218;
+                --font-ui: "FFM Space Grotesk", "Segoe UI", sans-serif;
+                --font-display: "FFM Space Grotesk", "Segoe UI", sans-serif;
+                --font-mono: "FFM Plex Mono", "Cascadia Code", Consolas, monospace;
+                --radius: 14px;
+                --radius-lg: 20px;
+                --title-weight: 600;
+                --title-track: 0.03em;
+            }
+            body.theme-abyss {
+                background:
+                    radial-gradient(
+                        ellipse at 50% 100%,
+                        rgba(0, 220, 200, 0.1),
+                        transparent 55%
+                    ),
+                    #001218 !important;
+            }
+            .theme-abyss .btn-primary {
+                background: linear-gradient(135deg, #00dcc8, #4488ff) !important;
+                color: #001218 !important;
+                border: none !important;
+                box-shadow: 0 4px 18px var(--accent-glow) !important;
+            }
+            .theme-abyss .titlebar-icon {
+                background: linear-gradient(135deg, #00dcc8, #4488ff) !important;
+                box-shadow: 0 0 12px var(--accent-glow) !important;
+            }
+            .theme-abyss .config-item.selected {
+                border-left: 3px solid var(--accent) !important;
+                background: rgba(0, 220, 200, 0.08) !important;
+            }
+            .theme-abyss ::-webkit-scrollbar-thumb {
+                background: linear-gradient(180deg, #00dcc8, #4488ff) !important;
+                border-radius: 14px;
+            }
+            .theme-abyss .loader-logo {
+                background: linear-gradient(135deg, #00dcc8, #4488ff) !important;
+                color: #001218 !important;
+            }
+            #abyss-canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                z-index: -1;
+                pointer-events: none;
+                display: none;
+            }
+            body.theme-abyss #abyss-canvas {
+                display: block;
+            }
+
+            /* === Plasma Theme (Holographic Prism) ===
+               Dark with rainbow holographic particles. Strictly dark. */
+            .theme-plasma {
+                --bg-base: #0c0c18;
+                --bg-sidebar: rgba(20, 20, 40, 0.85);
+                --bg-panel: rgba(28, 28, 56, 0.8);
+                --bg-card: rgba(40, 40, 80, 0.75);
+                --bg-elevated: rgba(56, 56, 112, 0.9);
+                --bg-hover: rgba(180, 100, 255, 0.12);
+                --bg-input: rgba(16, 16, 32, 0.9);
+                --bg-selected: rgba(180, 100, 255, 0.18);
+                --border: rgba(180, 100, 255, 0.2);
+                --border-light: rgba(200, 150, 255, 0.3);
+                --text: #f0eaff;
+                --text-dim: #a090c8;
+                --text-dark: #605080;
+                --accent: #b464ff;
+                --accent-hover: #c884ff;
+                --accent-dim: #9040dd;
+                --accent-glow: rgba(180, 100, 255, 0.4);
+                --purple: #64d8ff;
+                --purple-hover: #84e8ff;
+                --success: #64ff90;
+                --error: #ff6488;
+                --warning: #ffcc64;
+                --btn-ink: #0c0c18;
+                --font-ui: "FFM Outfit", "Segoe UI", sans-serif;
+                --font-display: "FFM Syne", "Segoe UI", sans-serif;
+                --font-mono: "FFM Plex Mono", "Cascadia Code", Consolas, monospace;
+                --radius: 10px;
+                --radius-lg: 14px;
+                --title-weight: 700;
+                --title-track: 0.05em;
+            }
+            body.theme-plasma {
+                background:
+                    radial-gradient(
+                        ellipse at 30% 20%,
+                        rgba(180, 100, 255, 0.1),
+                        transparent 50%
+                    ),
+                    radial-gradient(
+                        ellipse at 70% 80%,
+                        rgba(100, 216, 255, 0.08),
+                        transparent 45%
+                    ),
+                    #0c0c18 !important;
+            }
+            .theme-plasma .btn-primary {
+                background: linear-gradient(135deg, #b464ff, #64d8ff, #ff64a0) !important;
+                color: #0c0c18 !important;
+                border: none !important;
+                box-shadow: 0 4px 18px var(--accent-glow) !important;
+            }
+            .theme-plasma .titlebar-title {
+                background: linear-gradient(90deg, #b464ff, #64d8ff, #ff64a0);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+            .theme-plasma .titlebar-icon {
+                background: linear-gradient(135deg, #b464ff, #64d8ff, #ff64a0) !important;
+                box-shadow: 0 0 12px var(--accent-glow) !important;
+            }
+            .theme-plasma .config-item.selected {
+                border-left: 3px solid var(--accent) !important;
+                background: rgba(180, 100, 255, 0.08) !important;
+            }
+            .theme-plasma ::-webkit-scrollbar-thumb {
+                background: linear-gradient(180deg, #b464ff, #64d8ff) !important;
+            }
+            .theme-plasma .loader-logo {
+                background: linear-gradient(135deg, #b464ff, #64d8ff, #ff64a0) !important;
+                color: #0c0c18 !important;
+            }
+            #plasma-canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                z-index: -1;
+                pointer-events: none;
+                display: none;
+            }
+            body.theme-plasma #plasma-canvas {
+                display: block;
             }
 
             /* === Scrollbar === */
@@ -5213,9 +4643,7 @@
                         var t = JSON.parse(raw).currentTheme;
                         if (t) theme = t;
                     }
-                    if (theme === "prism") theme = "neko";
-                    if (theme === "pitch") theme = "bw";
-                    if (theme && theme !== "premium") {
+                                                            if (theme && theme !== "premium") {
                         document.body.classList.add("theme-" + theme);
                     }
                     // Light/dark is a separate toggle; Ignite & Cherry set their
@@ -5345,11 +4773,6 @@
                         box-shadow: 0 0 50px var(--accent-glow);
                     }
                 }
-                /* Matrix gets a terminal-style splash to match its theme. */
-                body.theme-matrix #loading-text,
-                body.theme-matrix #loading-subtext {
-                    font-family: var(--font-mono);
-                }
             </style>
         </div>
 
@@ -5378,10 +4801,14 @@
             <div id="preset-cm" class="preset-menu"></div>
 
             <!-- Matrix Animation Layer -->
-            <canvas id="matrix-canvas"></canvas>
-            <canvas id="petals-canvas"></canvas>
-            <canvas id="aurora-canvas"></canvas>
-            <canvas id="neko-canvas"></canvas>
+                                                
+            <!-- Animated Theme Canvases -->
+            <canvas id="cyberpunk-canvas"></canvas>
+            <canvas id="nebula-canvas"></canvas>
+            <canvas id="synthwave-canvas"></canvas>
+            <canvas id="ember-canvas"></canvas>
+            <canvas id="abyss-canvas"></canvas>
+            <canvas id="plasma-canvas"></canvas>
 
             <!-- Title Bar -->
             <div class="titlebar pywebview-drag-region">
@@ -6487,185 +5914,26 @@
                                     <option value="premium">
                                         Premium Glass
                                     </option>
-                                    <option value="ignite">
-                                        Ignite (Lava)
+                                    <option value="cyberpunk">
+                                        Cyberpunk Grid
                                     </option>
-                                    <option value="matrix">
-                                        Matrix (Terminal)
+                                    <option value="nebula">
+                                        Nebula Drift
                                     </option>
-                                    <option value="cherry">
-                                        Cherry Blossom ðŸŒ¸
+                                    <option value="synthwave">
+                                        Synthwave Sunset
                                     </option>
-                                    <option value="studio">
-                                        Studio (Graphite)
+                                    <option value="ember">
+                                        Ember Rising
                                     </option>
-                                    <option value="nocturne">
-                                        Nocturne (Editorial)
+                                    <option value="abyss">
+                                        Abyss Glow
                                     </option>
-                                    <option value="mocha">
-                                        Mocha (Glass)
+                                    <option value="plasma">
+                                        Plasma Prism
                                     </option>
-                                    <option value="vellum">
-                                        Vellum (Paper)
-                                    </option>
-                                    <option value="aurora">
-                                        Aurora (Lights)
-                                    </option>
-                                    <option value="neko">
-                                        Neko (Cats)
-                                    </option>
-                                    <option value="bw">Black &amp; White</option>
-                                </select>
+                                    </select>
                             </div>
-                            <!-- Cherry Blossom petal controls (shown only when
-                                 that theme is active). -->
-                            <div
-                                class="settings-row"
-                                id="cherry-petals-row"
-                                style="margin-top: 8px; display: none"
-                            >
-                                <label class="toggle">
-                                    <input
-                                        type="checkbox"
-                                        id="settings-cherry-petals"
-                                        checked
-                                        onchange="togglePetals(this.checked)"
-                                    />
-                                    <span class="toggle-slider"></span>
-                                </label>
-                                <span class="settings-label"
-                                    >Falling petals ðŸŒ¸</span
-                                >
-                            </div>
-                            <div
-                                class="settings-row"
-                                id="petal-speed-row"
-                                style="
-                                    margin-top: 8px;
-                                    flex-direction: column;
-                                    align-items: flex-start;
-                                    gap: 8px;
-                                    display: none;
-                                "
-                            >
-                                <span class="settings-label"
-                                    >Petal Speed:
-                                    <span
-                                        id="petal-speed-val"
-                                        style="
-                                            color: var(--accent);
-                                            font-weight: bold;
-                                        "
-                                        >5</span
-                                    ></span
-                                >
-                                <input
-                                    type="range"
-                                    id="settings-petal-speed"
-                                    min="1"
-                                    max="10"
-                                    step="1"
-                                    value="5"
-                                    style="
-                                        width: 100%;
-                                        accent-color: var(--accent);
-                                    "
-                                    oninput="updatePetalSpeedUI(this.value)"
-                                    onchange="savePetalSpeed(this.value)"
-                                />
-                            </div>
-                            <div
-                                class="settings-row"
-                                id="matrix-speed-row"
-                                style="
-                                    margin-top: 8px;
-                                    flex-direction: column;
-                                    align-items: flex-start;
-                                    gap: 8px;
-                                "
-                            >
-                                <span class="settings-label"
-                                    >Animation Speed:
-                                    <span
-                                        id="matrix-speed-val"
-                                        style="
-                                            color: var(--accent);
-                                            font-weight: bold;
-                                        "
-                                        >5</span
-                                    ></span
-                                >
-                                <input
-                                    type="range"
-                                    id="settings-matrix-speed"
-                                    min="1"
-                                    max="10"
-                                    step="1"
-                                    value="5"
-                                    style="
-                                        width: 100%;
-                                        accent-color: var(--accent);
-                                    "
-                                    oninput="updateMatrixSpeedUI(this.value)"
-                                    onchange="saveMatrixSpeed(this.value)"
-                                />
-                            </div>
-                            <!-- Apply sound (A3): plays apply.mp3 on a successful
-                                 manual apply or the first auto-apply at launch.
-                                 Volume slider shows only while the toggle is on. -->
-                            <div
-                                class="settings-row"
-                                id="apply-sound-row"
-                                style="margin-top: 8px"
-                            >
-                                <label class="toggle">
-                                    <input
-                                        type="checkbox"
-                                        id="settings-apply-sound"
-                                        checked
-                                        onchange="toggleApplySound(this.checked)"
-                                    />
-                                    <span class="toggle-slider"></span>
-                                </label>
-                                <span class="settings-label">Apply sound ðŸ”Š</span>
-                            </div>
-                            <div
-                                class="settings-row"
-                                id="apply-sound-volume-row"
-                                style="
-                                    margin-top: 8px;
-                                    flex-direction: column;
-                                    align-items: flex-start;
-                                    gap: 8px;
-                                "
-                            >
-                                <span class="settings-label"
-                                    >Volume:
-                                    <span
-                                        id="apply-sound-volume-val"
-                                        style="
-                                            color: var(--accent);
-                                            font-weight: bold;
-                                        "
-                                        >100</span
-                                    >%</span
-                                >
-                                <input
-                                    type="range"
-                                    id="settings-apply-sound-volume"
-                                    min="0"
-                                    max="100"
-                                    step="1"
-                                    value="100"
-                                    style="
-                                        width: 100%;
-                                        accent-color: var(--accent);
-                                    "
-                                    oninput="updateApplySoundVolumeUI(this.value)"
-                                    onchange="saveApplySoundVolume(this.value)"
-                                />
-                            </div>
-                        </div>
 
                         <div class="settings-section settings-card" data-cat="advanced">
                             <div class="settings-section-title">Flag Enforcement</div>
@@ -7691,25 +6959,17 @@
 
             function setUITheme(theme, save = true) {
               try {
-                if (theme === "prism") theme = "neko";
-                if (theme === "pitch") theme = "bw";
-                currentTheme = theme;
+                                                currentTheme = theme;
 
                 // Remove existing theme classes
                 document.body.classList.remove(
                     "theme-legacy",
-                    "theme-ignite",
-                    "theme-matrix",
-                    "theme-cherry",
-                    "theme-studio",
-                    "theme-nocturne",
-                    "theme-mocha",
-                    "theme-vellum",
-                    "theme-aurora",
-                    "theme-neko",
-                    "theme-prism",
-                    "theme-pitch",
-                    "theme-bw",
+                    "theme-cyberpunk",
+                    "theme-nebula",
+                    "theme-synthwave",
+                    "theme-ember",
+                    "theme-abyss",
+                    "theme-plasma",
                 );
 
                 // Apply the newly selected theme class (if it is not premium, which is the default CSS)
@@ -7717,49 +6977,19 @@
                     document.body.classList.add("theme-" + theme);
                 }
 
-                // Manage Matrix Canvas Animation
-                toggleMatrixAnim(theme === "matrix");
-                toggleAuroraAnim(theme === "aurora");
-                toggleNekoAnim(theme === "neko");
+                // Start/stop theme animations
+                toggleCyberpunkAnim(theme === "cyberpunk");
+                toggleNebulaAnim(theme === "nebula");
+                toggleSynthwaveAnim(theme === "synthwave");
+                toggleEmberAnim(theme === "ember");
+                toggleAbyssAnim(theme === "abyss");
+                togglePlasmaAnim(theme === "plasma");
 
-                // Hide/Show Matrix speed slider
-                const matrixSpeedRow =
-                    document.getElementById("matrix-speed-row");
-                if (matrixSpeedRow) {
-                    matrixSpeedRow.style.display =
-                        theme === "matrix" ? "flex" : "none";
-                }
-
-                // Cherry Blossom: show petal controls + run the petal animation
-                // only for this theme. Leaving it stops + clears the petals.
-                const isCherry = theme === "cherry";
-                const petalsRow =
-                    document.getElementById("cherry-petals-row");
-                if (petalsRow)
-                    petalsRow.style.display = isCherry ? "flex" : "none";
-                if (isCherry) {
-                    applyPetalsState();
-                } else {
-                    document.body.classList.remove("petals-on");
-                    togglePetalAnim(false);
-                    const petalSpeedRow =
-                        document.getElementById("petal-speed-row");
-                    if (petalSpeedRow) petalSpeedRow.style.display = "none";
-                }
-
-                // Hide Light Mode for skins that own their palette:
-                // Ignite/Studio/Nocturne/Mocha are strictly dark; Cherry and
-                // Vellum are strictly light. Aurora and Neko keep the toggle.
+                // Hide Light Mode for skins that own their palette.
                 const lightModeRow = document.getElementById("light-mode-row");
                 if (lightModeRow) {
-                    const isIgnite = theme === "ignite";
-                    const forceDark =
-                        isIgnite ||
-                        theme === "studio" ||
-                        theme === "nocturne" ||
-                        theme === "mocha";
-                    const hideLight =
-                        forceDark || isCherry || theme === "vellum";
+                    const forceDark = false;
+                    const hideLight = false;
                     lightModeRow.style.display = hideLight ? "none" : "flex";
                     if (
                         forceDark &&
@@ -9330,38 +8560,6 @@
                     document.getElementById("settings-auto-apply").checked =
                         s.auto_apply;
 
-                    // Theme animation prefs â€” read BEFORE applying the theme so
-                    // the petals/rain start at the saved speed + on/off state.
-                    if (typeof s.cherry_petals_enabled !== "undefined") {
-                        petalsEnabled = !!s.cherry_petals_enabled;
-                        const pt = document.getElementById(
-                            "settings-cherry-petals",
-                        );
-                        if (pt) pt.checked = petalsEnabled;
-                    }
-                    if (typeof s.cherry_petal_speed !== "undefined") {
-                        const pv = Math.max(
-                            1,
-                            Math.min(parseInt(s.cherry_petal_speed) || 5, 10),
-                        );
-                        const ps = document.getElementById(
-                            "settings-petal-speed",
-                        );
-                        if (ps) ps.value = pv;
-                        updatePetalSpeedUI(pv);
-                    }
-                    if (typeof s.matrix_speed !== "undefined") {
-                        const mv = Math.max(
-                            1,
-                            Math.min(parseInt(s.matrix_speed) || 5, 10),
-                        );
-                        const ms = document.getElementById(
-                            "settings-matrix-speed",
-                        );
-                        if (ms) ms.value = mv;
-                        updateMatrixSpeedUI(mv);
-                    }
-
                     // Apply sound (A3) on/off + volume.
                     if (typeof s.apply_sound_enabled !== "undefined") {
                         applySoundEnabled = !!s.apply_sound_enabled;
@@ -9737,24 +8935,7 @@
                 }
             }
 
-            function resetMatrixCanvas() {
-                if (!matrixCanvas) return;
-                const isLight = document.body.classList.contains("light-theme");
-                // Instantly fill with the solid base color
-                ctx.fillStyle = isLight ? "#f5f5f8" : "#010401";
-                ctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
-                // Also reset preset canvases
-                presetMatrixInstances.forEach((inst) => {
-                    inst.ctx.fillStyle = isLight
-                        ? "#f0f0f5"
-                        : "rgba(1, 20, 5, 1)";
-                    inst.ctx.fillRect(
-                        0,
-                        0,
-                        inst.canvas.width,
-                        inst.canvas.height,
-                    );
-                });
+            );
             }
 
             async function setCloseTray(val) {
@@ -11453,18 +10634,6 @@
                     : null;
             }
 
-            // Matrix State
-            let matrixSpeed = 5;
-
-            function updateMatrixSpeedUI(val) {
-                document.getElementById("matrix-speed-val").textContent = val;
-                matrixSpeed = parseInt(val);
-            }
-
-            function saveMatrixSpeed(val) {
-                if (window.pywebview && pywebview.api) {
-                    pywebview.api.save_setting("matrix_speed", parseInt(val));
-                }
             }
 
             // === Pointer-history settings (Advanced) ===
@@ -11503,134 +10672,6 @@
                 if (sliderRow) sliderRow.style.display = enabled ? "flex" : "none";
             }
 
-            // === Matrix Canvas Animation Engine ===
-            class PresetMatrix {
-                constructor(canvas, flagCount) {
-                    this.canvas = canvas;
-                    this.ctx = canvas.getContext("2d");
-                    this.flagCount = flagCount;
-                    this.drops = [];
-                    this.fontSize = 10;
-                    this.matrixChars =
-                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".split("");
-                    this.animFrame = null;
-                    this.lastDrawTime = 0;
-
-                    this.resize();
-                }
-
-                resize() {
-                    const rect =
-                        this.canvas.parentElement.getBoundingClientRect();
-                    this.canvas.width = rect.width;
-                    this.canvas.height = rect.height;
-                    const columns = Math.ceil(
-                        this.canvas.width / this.fontSize,
-                    );
-                    this.drops = [];
-                    for (let i = 0; i < columns; i++) {
-                        this.drops[i] = Math.random() * -20;
-                    }
-                }
-
-                draw(timestamp) {
-                    // Use a real clock, not the rAF timestamp: the ad
-                    // viewability shim swaps requestAnimationFrame between real
-                    // and synthetic timestamp domains, and a backwards jump
-                    // would freeze the animation. performance.now() is immune.
-                    timestamp = performance.now();
-                    // Piecewise throttle based on speed 4 as the base
-                    // 1 = ~490ms (Very slow)
-                    // 4 = ~100ms (Your favorite base)
-                    // 10 = ~20ms (Original top speed)
-                    const baseThrottle =
-                        matrixSpeed <= 4
-                            ? 100 + (4 - matrixSpeed) * 130
-                            : 100 - (matrixSpeed - 4) * 13.3;
-
-                    // Further adjust by flag count (more flags = slightly more active)
-                    const throttle = Math.max(
-                        15,
-                        baseThrottle - this.flagCount / 5,
-                    );
-
-                    if (timestamp - this.lastDrawTime < throttle) {
-                        this.animFrame = requestAnimationFrame((t) =>
-                            this.draw(t),
-                        );
-                        return;
-                    }
-                    this.lastDrawTime = timestamp;
-
-                    const isLight =
-                        document.body.classList.contains("light-theme");
-
-                    // Adapt background and text color to theme
-                    this.ctx.fillStyle = isLight
-                        ? "rgba(255, 255, 255, 0.15)"
-                        : "rgba(8, 4, 20, 0.1)";
-                    this.ctx.fillRect(
-                        0,
-                        0,
-                        this.canvas.width,
-                        this.canvas.height,
-                    );
-
-                    this.ctx.font = this.fontSize + "px monospace";
-
-                    for (let i = 0; i < this.drops.length; i++) {
-                        const text =
-                            this.matrixChars[
-                                Math.floor(
-                                    Math.random() * this.matrixChars.length,
-                                )
-                            ];
-                        const x = i * this.fontSize;
-                        const y = this.drops[i] * this.fontSize;
-
-                        // SPECIAL: Make the LEADING (last added) character stand out
-                        if (isLight) {
-                            this.ctx.fillStyle = "rgba(0, 0, 0, 0.8)"; // Darker leading char for light mode
-                        } else {
-                            this.ctx.fillStyle = "#fff"; // Glowing white lead for dark mode
-                        }
-                        this.ctx.fillText(text, x, y);
-
-                        // Set color for the trail
-                        this.ctx.fillStyle = isLight
-                            ? "rgba(0, 0, 0, 0.35)"
-                            : "#c4b5fd";
-
-                        if (
-                            this.drops[i] * this.fontSize >
-                                this.canvas.height &&
-                            Math.random() > 0.975
-                        ) {
-                            this.drops[i] = 0;
-                        }
-                        this.drops[i]++;
-                    }
-                    this.animFrame = requestAnimationFrame((t) => this.draw(t));
-                }
-
-                start() {
-                    this.resize();
-                    this.lastDrawTime = performance.now();
-                    this.animFrame = requestAnimationFrame((t) => this.draw(t));
-                }
-
-                stop() {
-                    if (this.animFrame) cancelAnimationFrame(this.animFrame);
-                    this.ctx.clearRect(
-                        0,
-                        0,
-                        this.canvas.width,
-                        this.canvas.height,
-                    );
-                }
-            }
-
-            let presetMatrixInstances = [];
             let currentPreviewPreset = null;
 
             async function loadPresets() {
@@ -11651,8 +10692,6 @@
                     // and swap to the new ones in a single paint â€” no empty-grid
                     // flash when opening the Presets tab. (If the fetch throws,
                     // the old grid is left intact rather than blanked.)
-                    presetMatrixInstances.forEach((inst) => inst.stop());
-                    presetMatrixInstances = [];
                     grid.innerHTML = addCardHtml;
 
                     for (const p of presets) {
@@ -11684,11 +10723,7 @@
                         card.className = "preset-card";
                         card.setAttribute("data-id", p.id);
 
-                        // Override coloring for Dark Matrix (looks ass otherwise)
-                        const isDarkMatrix =
-                            currentTheme === "matrix" &&
-                            !document.body.classList.contains("light-theme");
-                        const displayColor = isDarkMatrix ? "#c4b5fd" : p.color;
+                        const displayColor = p.color;
 
                         card.style.setProperty("--preset-color", displayColor);
                         const rgb = hexToRgb(displayColor) || {
@@ -11711,8 +10746,7 @@
                         };
 
                         card.innerHTML = `
-              <canvas class="preset-matrix-canvas"></canvas>
-              <div class="preset-header">
+                            <div class="preset-header">
                 <div style="flex:1; min-width:0;">
                   <div class="preset-color-strip" style="background:${displayColor}"></div>
                   <div class="preset-title" title="${escHtml(p.name)}">${escHtml(p.name)}</div>
@@ -11734,12 +10768,7 @@
             `;
                         grid.appendChild(card);
 
-                        const canvas = card.querySelector(
-                            ".preset-matrix-canvas",
-                        );
-                        const inst = new PresetMatrix(canvas, p.flags.length);
-                        presetMatrixInstances.push(inst);
-                        if (currentTheme === "matrix") inst.start();
+                        
                     }
 
                     // (Discord CTA lives as a permanent footer outside the
@@ -12679,435 +11708,425 @@
                 );
             }
 
-            // === Matrix Canvas Animation Engine ===
-            const matrixCanvas = document.getElementById("matrix-canvas");
-            const ctx = matrixCanvas.getContext("2d");
-            let matrixAnimFrame;
-            let drops = [];
-            let matrixChars =
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()ãƒ©ãƒ‰ã‚¯ãƒªãƒ•ã‚¤ã‚±ãƒ¡ãƒ³";
-            matrixChars = matrixChars.split("");
-            const fontSize = 11;
-            let lastDrawTime = 0;
 
-            function resizeMatrix() {
-                matrixCanvas.width = window.innerWidth;
-                matrixCanvas.height = window.innerHeight;
-                const columns = Math.ceil(matrixCanvas.width / fontSize);
-                drops = [];
-                for (let i = 0; i < columns; i++) {
-                    drops[i] = Math.random() * -100; // Start off-screen
-                }
+            // ===== Cyberpunk: animated neon grid =====
+            const cyberpunkCanvas = document.getElementById("cyberpunk-canvas");
+            const cyberpunkCtx = cyberpunkCanvas ? cyberpunkCanvas.getContext("2d") : null;
+            let cyberpunkAnimFrame;
+            let cyberpunkGridOffset = 0;
+            let lastCyberpunkDraw = 0;
+
+            function resizeCyberpunk() {
+                if (!cyberpunkCanvas) return;
+                cyberpunkCanvas.width = window.innerWidth;
+                cyberpunkCanvas.height = window.innerHeight;
             }
 
-            function drawMatrix(timestamp) {
-                matrixAnimFrame = requestAnimationFrame(drawMatrix);
-
-                // Use a real clock, not the rAF timestamp: the ad viewability
-                // shim swaps requestAnimationFrame between real and synthetic
-                // timestamp domains; a backwards jump used to freeze the rain
-                // (it only resumed when the window lost focus). performance.now()
-                // is monotonic and immune.
-                timestamp = performance.now();
-
-                // Balanced linear range for better responsiveness
-                // 1 = ~119ms (Active enough)
-                // 4 = ~86ms (Your preferred baseline area)
-                // 10 = 20ms (Original top speed)
-                const throttle = 130 - matrixSpeed * 11;
-
-                if (timestamp - lastDrawTime < throttle) return;
-                lastDrawTime = timestamp;
-
-                const isLight = document.body.classList.contains("light-theme");
-
-                // Proportional Fading: Adjust alpha based on throttle to keep trail lengths consistent
-                // If the speed is slow, we fade less per frame. If fast, we fade more.
-                const baseAlpha = isLight ? 0.12 : 0.06;
-                const fadeAlpha = baseAlpha * (throttle / 130);
-
-                ctx.fillStyle = isLight
-                    ? `rgba(255, 255, 255, ${fadeAlpha})`
-                    : `rgba(8, 4, 20, ${fadeAlpha})`;
-                ctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
-
-                ctx.font = fontSize + 'px "Courier New", monospace';
-
-                for (let i = 0; i < drops.length; i++) {
-                    const text =
-                        matrixChars[
-                            Math.floor(Math.random() * matrixChars.length)
-                        ];
-
-                    // Smoother fading colors
-                    const opacity = (0.4 + Math.random() * 0.35).toFixed(2);
-                    if (isLight) {
-                        ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`;
-                    } else {
-                        ctx.fillStyle = `rgba(168, 130, 255, ${opacity})`;
-                    }
-
-                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-                    if (
-                        drops[i] * fontSize > matrixCanvas.height &&
-                        Math.random() > 0.985
-                    ) {
-                        drops[i] = 0;
-                    }
-                    // Fall exactly 1 character block down
-                    drops[i]++;
+            function drawCyberpunk() {
+                cyberpunkAnimFrame = requestAnimationFrame(drawCyberpunk);
+                const now = performance.now();
+                if (now - lastCyberpunkDraw < 33) return;
+                lastCyberpunkDraw = now;
+                if (!cyberpunkCtx) return;
+                cyberpunkCtx.clearRect(0, 0, cyberpunkCanvas.width, cyberpunkCanvas.height);
+                const w = cyberpunkCanvas.width;
+                const h = cyberpunkCanvas.height;
+                const horizon = h * 0.55;
+                cyberpunkGridOffset = (cyberpunkGridOffset + 1.5) % 40;
+                // Perspective grid below horizon
+                cyberpunkCtx.strokeStyle = "rgba(255, 0, 234, 0.25)";
+                cyberpunkCtx.lineWidth = 1;
+                for (let x = -w; x < w * 2; x += 40) {
+                    cyberpunkCtx.beginPath();
+                    cyberpunkCtx.moveTo(w / 2, horizon);
+                    cyberpunkCtx.lineTo(x, h);
+                    cyberpunkCtx.stroke();
                 }
+                for (let i = 0; i < 20; i++) {
+                    const y = horizon + (i * i * 2) + cyberpunkGridOffset;
+                    if (y > h) break;
+                    cyberpunkCtx.beginPath();
+                    cyberpunkCtx.moveTo(0, y);
+                    cyberpunkCtx.lineTo(w, y);
+                    cyberpunkCtx.strokeStyle = `rgba(0, 255, 255, ${0.15 + (y - horizon) / (h - horizon) * 0.25})`;
+                    cyberpunkCtx.stroke();
+                }
+                // Horizon glow
+                const grad = cyberpunkCtx.createLinearGradient(0, horizon - 30, 0, horizon + 30);
+                grad.addColorStop(0, "rgba(255, 0, 234, 0)");
+                grad.addColorStop(0.5, "rgba(255, 0, 234, 0.15)");
+                grad.addColorStop(1, "rgba(255, 0, 234, 0)");
+                cyberpunkCtx.fillStyle = grad;
+                cyberpunkCtx.fillRect(0, horizon - 30, w, 60);
             }
 
-            function toggleMatrixAnim(enable) {
+            function toggleCyberpunkAnim(enable) {
+                if (!cyberpunkCanvas || !cyberpunkCtx) return;
                 if (enable) {
-                    resizeMatrix();
-                    window.addEventListener("resize", resizeMatrix);
-                    lastDrawTime = performance.now();
-                    matrixAnimFrame = requestAnimationFrame(drawMatrix);
-                    presetMatrixInstances.forEach((inst) => inst.start());
+                    resizeCyberpunk();
+                    window.addEventListener("resize", resizeCyberpunk);
+                    lastCyberpunkDraw = performance.now();
+                    cancelAnimationFrame(cyberpunkAnimFrame);
+                    cyberpunkAnimFrame = requestAnimationFrame(drawCyberpunk);
                 } else {
-                    window.removeEventListener("resize", resizeMatrix);
-                    cancelAnimationFrame(matrixAnimFrame);
-                    ctx.clearRect(
-                        0,
-                        0,
-                        matrixCanvas.width,
-                        matrixCanvas.height,
-                    );
-                    presetMatrixInstances.forEach((inst) => inst.stop());
+                    window.removeEventListener("resize", resizeCyberpunk);
+                    cancelAnimationFrame(cyberpunkAnimFrame);
+                    cyberpunkCtx.clearRect(0, 0, cyberpunkCanvas.width, cyberpunkCanvas.height);
                 }
             }
 
-            // ===== Cherry Blossom: falling-petals background =====
-            const petalsCanvas = document.getElementById("petals-canvas");
-            const petalsCtx = petalsCanvas.getContext("2d");
-            let petalAnimFrame;
-            let petals = [];
-            let petalSpeed = 5;
-            let petalsEnabled = true;
-            let lastPetalDraw = 0;
-            const PETAL_COLORS = [
-                "#e9d5ff",
-                "#c4b5fd",
-                "#a78bfa",
-                "#d8b4fe",
-                "#f0abfc",
-            ];
+            // ===== Nebula: drifting starfield =====
+            const nebulaCanvas = document.getElementById("nebula-canvas");
+            const nebulaCtx = nebulaCanvas ? nebulaCanvas.getContext("2d") : null;
+            let nebulaAnimFrame;
+            let nebulaStars = [];
+            let lastNebulaDraw = 0;
 
-            function _makePetal() {
-                const size = 6 + Math.random() * 8;
+            function _makeNebulaStar() {
                 return {
-                    x: Math.random() * petalsCanvas.width,
-                    y: Math.random() * -petalsCanvas.height, // start above top
-                    size: size,
-                    rot: Math.random() * Math.PI * 2,
-                    rotSpeed: (Math.random() - 0.5) * 0.04,
-                    sway: Math.random() * Math.PI * 2,
-                    swayAmp: 0.5 + Math.random() * 1.2,
-                    fall: 0.6 + Math.random() * 0.9,
-                    color: PETAL_COLORS[
-                        Math.floor(Math.random() * PETAL_COLORS.length)
-                    ],
+                    x: Math.random() * nebulaCanvas.width,
+                    y: Math.random() * nebulaCanvas.height,
+                    r: Math.random() * 1.8 + 0.3,
+                    twinkle: Math.random() * Math.PI * 2,
+                    twinkleSpeed: 0.01 + Math.random() * 0.03,
+                    drift: 0.05 + Math.random() * 0.15,
+                    hue: Math.random() < 0.5 ? 280 : 330,
                 };
             }
 
-            function resizePetals() {
-                petalsCanvas.width = window.innerWidth;
-                petalsCanvas.height = window.innerHeight;
-                // Density scales gently with width and chosen speed.
-                const count = Math.round(
-                    (petalsCanvas.width / 1000) * (18 + petalSpeed * 4),
-                );
-                petals = [];
-                for (let i = 0; i < count; i++) petals.push(_makePetal());
+            function resizeNebula() {
+                if (!nebulaCanvas) return;
+                nebulaCanvas.width = window.innerWidth;
+                nebulaCanvas.height = window.innerHeight;
+                const count = Math.round((nebulaCanvas.width * nebulaCanvas.height) / 4000);
+                nebulaStars = [];
+                for (let i = 0; i < count; i++) nebulaStars.push(_makeNebulaStar());
             }
 
-            function _drawPetalShape(c, s) {
-                // A soft sakura petal with a little notch at the bottom.
-                c.beginPath();
-                c.moveTo(0, -s);
-                c.quadraticCurveTo(s * 0.9, -s * 0.4, s * 0.5, s * 0.5);
-                c.quadraticCurveTo(s * 0.18, s * 0.85, 0, s * 0.55);
-                c.quadraticCurveTo(-s * 0.18, s * 0.85, -s * 0.5, s * 0.5);
-                c.quadraticCurveTo(-s * 0.9, -s * 0.4, 0, -s);
-                c.closePath();
-            }
-
-            function drawPetals() {
-                petalAnimFrame = requestAnimationFrame(drawPetals);
-                // Monotonic clock â€” immune to the ad shim swapping rAF timestamp
-                // domains (same lesson as the matrix rain).
+            function drawNebula() {
+                nebulaAnimFrame = requestAnimationFrame(drawNebula);
                 const now = performance.now();
-                const throttle = 32 - petalSpeed * 2; // ~30ms .. 12ms
-                if (now - lastPetalDraw < throttle) return;
-                lastPetalDraw = now;
-
-                petalsCtx.clearRect(
-                    0,
-                    0,
-                    petalsCanvas.width,
-                    petalsCanvas.height,
-                );
-                const speedFactor = 0.5 + petalSpeed * 0.35;
-                for (const p of petals) {
-                    p.y += p.fall * speedFactor;
-                    p.sway += 0.02 * speedFactor;
-                    p.x += Math.sin(p.sway) * p.swayAmp * 0.4;
-                    p.rot += p.rotSpeed;
-
-                    petalsCtx.save();
-                    petalsCtx.translate(p.x, p.y);
-                    petalsCtx.rotate(p.rot);
-                    // Squash horizontally as it spins for a fluttering feel.
-                    petalsCtx.scale(
-                        0.7 + 0.3 * Math.abs(Math.cos(p.rot)),
-                        1,
-                    );
-                    petalsCtx.globalAlpha = 0.85;
-                    petalsCtx.fillStyle = p.color;
-                    _drawPetalShape(petalsCtx, p.size);
-                    petalsCtx.fill();
-                    petalsCtx.restore();
-
-                    if (p.y - p.size > petalsCanvas.height) {
-                        Object.assign(p, _makePetal());
-                        p.y = -p.size * 2;
-                    } else if (p.x > petalsCanvas.width + 20) {
-                        p.x = -20;
-                    } else if (p.x < -20) {
-                        p.x = petalsCanvas.width + 20;
+                if (now - lastNebulaDraw < 30) return;
+                lastNebulaDraw = now;
+                if (!nebulaCtx) return;
+                nebulaCtx.clearRect(0, 0, nebulaCanvas.width, nebulaCanvas.height);
+                for (const s of nebulaStars) {
+                    s.twinkle += s.twinkleSpeed;
+                    s.y += s.drift;
+                    if (s.y > nebulaCanvas.height) {
+                        Object.assign(s, _makeNebulaStar());
+                        s.y = -2;
                     }
+                    const alpha = 0.4 + Math.sin(s.twinkle) * 0.4;
+                    nebulaCtx.beginPath();
+                    nebulaCtx.globalAlpha = alpha;
+                    nebulaCtx.fillStyle = `hsl(${s.hue}, 80%, 75%)`;
+                    nebulaCtx.shadowColor = `hsl(${s.hue}, 80%, 70%)`;
+                    nebulaCtx.shadowBlur = s.r * 4;
+                    nebulaCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                    nebulaCtx.fill();
                 }
+                nebulaCtx.globalAlpha = 1;
+                nebulaCtx.shadowBlur = 0;
             }
 
-            function togglePetalAnim(enable) {
+            function toggleNebulaAnim(enable) {
+                if (!nebulaCanvas || !nebulaCtx) return;
                 if (enable) {
-                    resizePetals();
-                    window.addEventListener("resize", resizePetals);
-                    lastPetalDraw = performance.now();
-                    cancelAnimationFrame(petalAnimFrame);
-                    petalAnimFrame = requestAnimationFrame(drawPetals);
+                    resizeNebula();
+                    window.addEventListener("resize", resizeNebula);
+                    lastNebulaDraw = performance.now();
+                    cancelAnimationFrame(nebulaAnimFrame);
+                    nebulaAnimFrame = requestAnimationFrame(drawNebula);
                 } else {
-                    window.removeEventListener("resize", resizePetals);
-                    cancelAnimationFrame(petalAnimFrame);
-                    if (petalsCtx) {
-                        petalsCtx.clearRect(
-                            0,
-                            0,
-                            petalsCanvas.width,
-                            petalsCanvas.height,
-                        );
-                    }
+                    window.removeEventListener("resize", resizeNebula);
+                    cancelAnimationFrame(nebulaAnimFrame);
+                    nebulaCtx.clearRect(0, 0, nebulaCanvas.width, nebulaCanvas.height);
                 }
             }
 
-            // Apply the current petals on/off state while the Cherry theme is
-            // active: toggle the body class (CSS shows the canvas), show/hide the
-            // speed slider, and start/stop the animation.
+            // ===== Synthwave: sunset grid =====
+            const synthwaveCanvas = document.getElementById("synthwave-canvas");
+            const synthwaveCtx = synthwaveCanvas ? synthwaveCanvas.getContext("2d") : null;
+            let synthwaveAnimFrame;
+            let synthwaveGridOffset = 0;
+            let lastSynthwaveDraw = 0;
 
-            // ===== Aurora: falling lights (petals-style canvas) =====
-            const auroraCanvas = document.getElementById("aurora-canvas");
-            const auroraCtx = auroraCanvas ? auroraCanvas.getContext("2d") : null;
-            let auroraAnimFrame;
-            let auroraBits = [];
-            let lastAuroraDraw = 0;
-            const AURORA_COLORS = ["#a78bfa", "#8b5cf6", "#c084fc", "#c026d3"];
+            function resizeSynthwave() {
+                if (!synthwaveCanvas) return;
+                synthwaveCanvas.width = window.innerWidth;
+                synthwaveCanvas.height = window.innerHeight;
+            }
 
-            function _makeAuroraBit() {
+            function drawSynthwave() {
+                synthwaveAnimFrame = requestAnimationFrame(drawSynthwave);
+                const now = performance.now();
+                if (now - lastSynthwaveDraw < 33) return;
+                lastSynthwaveDraw = now;
+                if (!synthwaveCtx) return;
+                const w = synthwaveCanvas.width;
+                const h = synthwaveCanvas.height;
+                synthwaveCtx.clearRect(0, 0, w, h);
+                const horizon = h * 0.5;
+                synthwaveGridOffset = (synthwaveGridOffset + 2) % 50;
+                // Sun
+                const sunGrad = synthwaveCtx.createRadialGradient(w / 2, horizon - 40, 10, w / 2, horizon - 40, 120);
+                sunGrad.addColorStop(0, "rgba(255, 200, 100, 0.4)");
+                sunGrad.addColorStop(0.5, "rgba(255, 100, 200, 0.2)");
+                sunGrad.addColorStop(1, "rgba(255, 100, 200, 0)");
+                synthwaveCtx.fillStyle = sunGrad;
+                synthwaveCtx.fillRect(w / 2 - 120, horizon - 160, 240, 200);
+                // Grid
+                synthwaveCtx.strokeStyle = "rgba(255, 100, 200, 0.3)";
+                synthwaveCtx.lineWidth = 1;
+                for (let x = -w; x < w * 2; x += 50) {
+                    synthwaveCtx.beginPath();
+                    synthwaveCtx.moveTo(w / 2, horizon);
+                    synthwaveCtx.lineTo(x, h);
+                    synthwaveCtx.stroke();
+                }
+                for (let i = 0; i < 25; i++) {
+                    const y = horizon + (i * i * 1.5) + synthwaveGridOffset;
+                    if (y > h) break;
+                    synthwaveCtx.beginPath();
+                    synthwaveCtx.moveTo(0, y);
+                    synthwaveCtx.lineTo(w, y);
+                    synthwaveCtx.strokeStyle = `rgba(255, 170, 68, ${0.1 + (y - horizon) / (h - horizon) * 0.3})`;
+                    synthwaveCtx.stroke();
+                }
+            }
+
+            function toggleSynthwaveAnim(enable) {
+                if (!synthwaveCanvas || !synthwaveCtx) return;
+                if (enable) {
+                    resizeSynthwave();
+                    window.addEventListener("resize", resizeSynthwave);
+                    lastSynthwaveDraw = performance.now();
+                    cancelAnimationFrame(synthwaveAnimFrame);
+                    synthwaveAnimFrame = requestAnimationFrame(drawSynthwave);
+                } else {
+                    window.removeEventListener("resize", resizeSynthwave);
+                    cancelAnimationFrame(synthwaveAnimFrame);
+                    synthwaveCtx.clearRect(0, 0, synthwaveCanvas.width, synthwaveCanvas.height);
+                }
+            }
+
+            // ===== Ember: rising embers =====
+            const emberCanvas = document.getElementById("ember-canvas");
+            const emberCtx = emberCanvas ? emberCanvas.getContext("2d") : null;
+            let emberAnimFrame;
+            let emberBits = [];
+            let lastEmberDraw = 0;
+            const EMBER_COLORS = ["#ff5010", "#ff7030", "#ffaa20", "#ff8810", "#cc3808"];
+
+            function _makeEmberBit() {
                 return {
-                    x: Math.random() * auroraCanvas.width,
-                    y: Math.random() * -auroraCanvas.height,
-                    r: 2 + Math.random() * 4,
-                    fall: 0.35 + Math.random() * 0.7,
+                    x: Math.random() * emberCanvas.width,
+                    y: emberCanvas.height + Math.random() * 50,
+                    r: 1 + Math.random() * 3,
+                    rise: 0.5 + Math.random() * 1.5,
                     sway: Math.random() * Math.PI * 2,
-                    swayAmp: 0.4 + Math.random() * 1.1,
-                    color: AURORA_COLORS[
-                        Math.floor(Math.random() * AURORA_COLORS.length)
-                    ],
-                    alpha: 0.35 + Math.random() * 0.45,
+                    swayAmp: 0.3 + Math.random() * 0.8,
+                    color: EMBER_COLORS[Math.floor(Math.random() * EMBER_COLORS.length)],
+                    alpha: 0.4 + Math.random() * 0.5,
+                    life: 1,
                 };
             }
 
-            function resizeAurora() {
-                if (!auroraCanvas) return;
-                auroraCanvas.width = window.innerWidth;
-                auroraCanvas.height = window.innerHeight;
-                const count = Math.round((auroraCanvas.width / 1000) * 28);
-                auroraBits = [];
-                for (let i = 0; i < count; i++) auroraBits.push(_makeAuroraBit());
+            function resizeEmber() {
+                if (!emberCanvas) return;
+                emberCanvas.width = window.innerWidth;
+                emberCanvas.height = window.innerHeight;
+                const count = Math.round((emberCanvas.width / 1000) * 40);
+                emberBits = [];
+                for (let i = 0; i < count; i++) emberBits.push(_makeEmberBit());
             }
 
-            function drawAurora() {
-                auroraAnimFrame = requestAnimationFrame(drawAurora);
+            function drawEmber() {
+                emberAnimFrame = requestAnimationFrame(drawEmber);
                 const now = performance.now();
-                if (now - lastAuroraDraw < 24) return;
-                lastAuroraDraw = now;
-                auroraCtx.clearRect(0, 0, auroraCanvas.width, auroraCanvas.height);
-                for (const p of auroraBits) {
-                    p.y += p.fall;
-                    p.sway += 0.018;
-                    p.x += Math.sin(p.sway) * p.swayAmp * 0.35;
-                    auroraCtx.beginPath();
-                    auroraCtx.globalAlpha = p.alpha;
-                    auroraCtx.fillStyle = p.color;
-                    auroraCtx.shadowColor = p.color;
-                    auroraCtx.shadowBlur = 10;
-                    auroraCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                    auroraCtx.fill();
-                    if (p.y - p.r > auroraCanvas.height) {
-                        Object.assign(p, _makeAuroraBit());
-                        p.y = -p.r * 2;
-                    } else if (p.x > auroraCanvas.width + 20) {
-                        p.x = -20;
-                    } else if (p.x < -20) {
-                        p.x = auroraCanvas.width + 20;
+                if (now - lastEmberDraw < 25) return;
+                lastEmberDraw = now;
+                if (!emberCtx) return;
+                emberCtx.clearRect(0, 0, emberCanvas.width, emberCanvas.height);
+                for (const p of emberBits) {
+                    p.y -= p.rise;
+                    p.sway += 0.03;
+                    p.x += Math.sin(p.sway) * p.swayAmp * 0.5;
+                    p.life -= 0.003;
+                    if (p.y < -10 || p.life <= 0) {
+                        Object.assign(p, _makeEmberBit());
                     }
+                    emberCtx.beginPath();
+                    emberCtx.globalAlpha = p.alpha * p.life;
+                    emberCtx.fillStyle = p.color;
+                    emberCtx.shadowColor = p.color;
+                    emberCtx.shadowBlur = p.r * 5;
+                    emberCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    emberCtx.fill();
                 }
-                auroraCtx.globalAlpha = 1;
-                auroraCtx.shadowBlur = 0;
+                emberCtx.globalAlpha = 1;
+                emberCtx.shadowBlur = 0;
             }
 
-            function toggleAuroraAnim(enable) {
-                if (!auroraCanvas || !auroraCtx) return;
+            function toggleEmberAnim(enable) {
+                if (!emberCanvas || !emberCtx) return;
                 if (enable) {
-                    resizeAurora();
-                    window.addEventListener("resize", resizeAurora);
-                    lastAuroraDraw = performance.now();
-                    cancelAnimationFrame(auroraAnimFrame);
-                    auroraAnimFrame = requestAnimationFrame(drawAurora);
+                    resizeEmber();
+                    window.addEventListener("resize", resizeEmber);
+                    lastEmberDraw = performance.now();
+                    cancelAnimationFrame(emberAnimFrame);
+                    emberAnimFrame = requestAnimationFrame(drawEmber);
                 } else {
-                    window.removeEventListener("resize", resizeAurora);
-                    cancelAnimationFrame(auroraAnimFrame);
-                    auroraCtx.clearRect(0, 0, auroraCanvas.width, auroraCanvas.height);
+                    window.removeEventListener("resize", resizeEmber);
+                    cancelAnimationFrame(emberAnimFrame);
+                    emberCtx.clearRect(0, 0, emberCanvas.width, emberCanvas.height);
                 }
             }
 
-            // ===== Neko: falling cats (same canvas pattern as petals) =====
-            const nekoCanvas = document.getElementById("neko-canvas");
-            const nekoCtx = nekoCanvas ? nekoCanvas.getContext("2d") : null;
-            let nekoAnimFrame;
-            let nekoBits = [];
-            let lastNekoDraw = 0;
-            const NEKO_COLORS = ["#a78bfa", "#c4b5fd", "#8b5cf6", "#d8b4fe"];
+            // ===== Abyss: bioluminescent particles =====
+            const abyssCanvas = document.getElementById("abyss-canvas");
+            const abyssCtx = abyssCanvas ? abyssCanvas.getContext("2d") : null;
+            let abyssAnimFrame;
+            let abyssBits = [];
+            let lastAbyssDraw = 0;
+            const ABYSS_COLORS = ["#00dcc8", "#20f0dc", "#4488ff", "#66aaff", "#00ff88"];
 
-            function _drawCatShape(c, s) {
-                c.beginPath();
-                c.moveTo(-s * 0.42, -s * 0.08);
-                c.lineTo(-s * 0.55, -s * 0.88);
-                c.lineTo(-s * 0.06, -s * 0.36);
-                c.lineTo(s * 0.06, -s * 0.36);
-                c.lineTo(s * 0.55, -s * 0.88);
-                c.lineTo(s * 0.42, -s * 0.08);
-                c.arc(0, s * 0.14, s * 0.58, -0.9, Math.PI + 0.9, false);
-                c.closePath();
-            }
-
-            function _makeNekoBit() {
+            function _makeAbyssBit() {
                 return {
-                    x: Math.random() * nekoCanvas.width,
-                    y: Math.random() * -nekoCanvas.height,
-                    size: 10 + Math.random() * 10,
-                    rot: Math.random() * Math.PI * 2,
-                    rotSpeed: (Math.random() - 0.5) * 0.03,
-                    sway: Math.random() * Math.PI * 2,
-                    swayAmp: 0.5 + Math.random() * 1.2,
-                    fall: 0.5 + Math.random() * 0.8,
-                    color: NEKO_COLORS[
-                        Math.floor(Math.random() * NEKO_COLORS.length)
-                    ],
+                    x: Math.random() * abyssCanvas.width,
+                    y: Math.random() * abyssCanvas.height,
+                    r: 1.5 + Math.random() * 4,
+                    vx: (Math.random() - 0.5) * 0.3,
+                    vy: (Math.random() - 0.5) * 0.3,
+                    pulse: Math.random() * Math.PI * 2,
+                    pulseSpeed: 0.01 + Math.random() * 0.02,
+                    color: ABYSS_COLORS[Math.floor(Math.random() * ABYSS_COLORS.length)],
                 };
             }
 
-            function resizeNeko() {
-                if (!nekoCanvas) return;
-                nekoCanvas.width = window.innerWidth;
-                nekoCanvas.height = window.innerHeight;
-                const count = Math.round((nekoCanvas.width / 1000) * 16);
-                nekoBits = [];
-                for (let i = 0; i < count; i++) nekoBits.push(_makeNekoBit());
+            function resizeAbyss() {
+                if (!abyssCanvas) return;
+                abyssCanvas.width = window.innerWidth;
+                abyssCanvas.height = window.innerHeight;
+                const count = Math.round((abyssCanvas.width / 1000) * 25);
+                abyssBits = [];
+                for (let i = 0; i < count; i++) abyssBits.push(_makeAbyssBit());
             }
 
-            function drawNeko() {
-                nekoAnimFrame = requestAnimationFrame(drawNeko);
+            function drawAbyss() {
+                abyssAnimFrame = requestAnimationFrame(drawAbyss);
                 const now = performance.now();
-                if (now - lastNekoDraw < 28) return;
-                lastNekoDraw = now;
-                nekoCtx.clearRect(0, 0, nekoCanvas.width, nekoCanvas.height);
-                const speedFactor = 0.85;
-                for (const p of nekoBits) {
-                    p.y += p.fall * speedFactor;
-                    p.sway += 0.02 * speedFactor;
-                    p.x += Math.sin(p.sway) * p.swayAmp * 0.4;
-                    p.rot += p.rotSpeed;
-                    nekoCtx.save();
-                    nekoCtx.translate(p.x, p.y);
-                    nekoCtx.rotate(p.rot);
-                    nekoCtx.globalAlpha = 0.82;
-                    nekoCtx.fillStyle = p.color;
-                    _drawCatShape(nekoCtx, p.size);
-                    nekoCtx.fill();
-                    nekoCtx.restore();
-                    if (p.y - p.size > nekoCanvas.height) {
-                        Object.assign(p, _makeNekoBit());
-                        p.y = -p.size * 2;
-                    } else if (p.x > nekoCanvas.width + 24) {
-                        p.x = -24;
-                    } else if (p.x < -24) {
-                        p.x = nekoCanvas.width + 24;
-                    }
+                if (now - lastAbyssDraw < 28) return;
+                lastAbyssDraw = now;
+                if (!abyssCtx) return;
+                abyssCtx.clearRect(0, 0, abyssCanvas.width, abyssCanvas.height);
+                for (const p of abyssBits) {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.pulse += p.pulseSpeed;
+                    if (p.x < -20) p.x = abyssCanvas.width + 20;
+                    else if (p.x > abyssCanvas.width + 20) p.x = -20;
+                    if (p.y < -20) p.y = abyssCanvas.height + 20;
+                    else if (p.y > abyssCanvas.height + 20) p.y = -20;
+                    const alpha = 0.3 + Math.sin(p.pulse) * 0.3;
+                    abyssCtx.beginPath();
+                    abyssCtx.globalAlpha = alpha;
+                    abyssCtx.fillStyle = p.color;
+                    abyssCtx.shadowColor = p.color;
+                    abyssCtx.shadowBlur = p.r * 6;
+                    abyssCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    abyssCtx.fill();
                 }
+                abyssCtx.globalAlpha = 1;
+                abyssCtx.shadowBlur = 0;
             }
 
-            function toggleNekoAnim(enable) {
-                if (!nekoCanvas || !nekoCtx) return;
+            function toggleAbyssAnim(enable) {
+                if (!abyssCanvas || !abyssCtx) return;
                 if (enable) {
-                    resizeNeko();
-                    window.addEventListener("resize", resizeNeko);
-                    lastNekoDraw = performance.now();
-                    cancelAnimationFrame(nekoAnimFrame);
-                    nekoAnimFrame = requestAnimationFrame(drawNeko);
+                    resizeAbyss();
+                    window.addEventListener("resize", resizeAbyss);
+                    lastAbyssDraw = performance.now();
+                    cancelAnimationFrame(abyssAnimFrame);
+                    abyssAnimFrame = requestAnimationFrame(drawAbyss);
                 } else {
-                    window.removeEventListener("resize", resizeNeko);
-                    cancelAnimationFrame(nekoAnimFrame);
-                    nekoCtx.clearRect(0, 0, nekoCanvas.width, nekoCanvas.height);
+                    window.removeEventListener("resize", resizeAbyss);
+                    cancelAnimationFrame(abyssAnimFrame);
+                    abyssCtx.clearRect(0, 0, abyssCanvas.width, abyssCanvas.height);
                 }
             }
 
-            function applyPetalsState() {
-                document.body.classList.toggle("petals-on", petalsEnabled);
-                const speedRow = document.getElementById("petal-speed-row");
-                if (speedRow)
-                    speedRow.style.display = petalsEnabled ? "flex" : "none";
-                togglePetalAnim(petalsEnabled);
+            // ===== Plasma: holographic prism particles =====
+            const plasmaCanvas = document.getElementById("plasma-canvas");
+            const plasmaCtx = plasmaCanvas ? plasmaCanvas.getContext("2d") : null;
+            let plasmaAnimFrame;
+            let plasmaBits = [];
+            let lastPlasmaDraw = 0;
+            let plasmaHueOffset = 0;
+
+            function _makePlasmaBit() {
+                return {
+                    x: Math.random() * plasmaCanvas.width,
+                    y: Math.random() * plasmaCanvas.height,
+                    r: 2 + Math.random() * 5,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4,
+                    hue: Math.random() * 360,
+                    hueSpeed: 0.5 + Math.random() * 1,
+                };
             }
 
-            function togglePetals(enable) {
-                petalsEnabled = !!enable;
-                if (window.pywebview && pywebview.api) {
-                    pywebview.api.save_setting(
-                        "cherry_petals_enabled",
-                        petalsEnabled,
-                    );
+            function resizePlasma() {
+                if (!plasmaCanvas) return;
+                plasmaCanvas.width = window.innerWidth;
+                plasmaCanvas.height = window.innerHeight;
+                const count = Math.round((plasmaCanvas.width / 1000) * 20);
+                plasmaBits = [];
+                for (let i = 0; i < count; i++) plasmaBits.push(_makePlasmaBit());
+            }
+
+            function drawPlasma() {
+                plasmaAnimFrame = requestAnimationFrame(drawPlasma);
+                const now = performance.now();
+                if (now - lastPlasmaDraw < 30) return;
+                lastPlasmaDraw = now;
+                if (!plasmaCtx) return;
+                plasmaCtx.clearRect(0, 0, plasmaCanvas.width, plasmaCanvas.height);
+                plasmaHueOffset = (plasmaHueOffset + 0.5) % 360;
+                for (const p of plasmaBits) {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.hue = (p.hue + p.hueSpeed) % 360;
+                    if (p.x < -20) p.x = plasmaCanvas.width + 20;
+                    else if (p.x > plasmaCanvas.width + 20) p.x = -20;
+                    if (p.y < -20) p.y = plasmaCanvas.height + 20;
+                    else if (p.y > plasmaCanvas.height + 20) p.y = -20;
+                    const color = `hsl(${(p.hue + plasmaHueOffset) % 360}, 80%, 65%)`;
+                    plasmaCtx.beginPath();
+                    plasmaCtx.globalAlpha = 0.5;
+                    plasmaCtx.fillStyle = color;
+                    plasmaCtx.shadowColor = color;
+                    plasmaCtx.shadowBlur = p.r * 6;
+                    plasmaCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    plasmaCtx.fill();
                 }
-                if (currentTheme === "cherry") applyPetalsState();
+                plasmaCtx.globalAlpha = 1;
+                plasmaCtx.shadowBlur = 0;
             }
 
-            function updatePetalSpeedUI(val) {
-                const el = document.getElementById("petal-speed-val");
-                if (el) el.textContent = val;
-                petalSpeed = parseInt(val);
-                // Re-seed density to match the new speed if petals are running.
-                if (currentTheme === "cherry" && petalsEnabled) resizePetals();
-            }
-
-            function savePetalSpeed(val) {
-                if (window.pywebview && pywebview.api) {
-                    pywebview.api.save_setting(
-                        "cherry_petal_speed",
-                        parseInt(val),
-                    );
+            function togglePlasmaAnim(enable) {
+                if (!plasmaCanvas || !plasmaCtx) return;
+                if (enable) {
+                    resizePlasma();
+                    window.addEventListener("resize", resizePlasma);
+                    lastPlasmaDraw = performance.now();
+                    cancelAnimationFrame(plasmaAnimFrame);
+                    plasmaAnimFrame = requestAnimationFrame(drawPlasma);
+                } else {
+                    window.removeEventListener("resize", resizePlasma);
+                    cancelAnimationFrame(plasmaAnimFrame);
+                    plasmaCtx.clearRect(0, 0, plasmaCanvas.width, plasmaCanvas.height);
                 }
             }
 
