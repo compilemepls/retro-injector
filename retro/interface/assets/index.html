@@ -8925,9 +8925,6 @@
                     localStorage.setItem("retro_light", isLight ? "1" : "0");
                 } catch (e) {}
 
-                // Instant reset of matrix canvas to prevent "grayish" ghosting
-                resetMatrixCanvas();
-
                 try {
                     await pywebview.api.set_theme(isLight ? "light" : "dark");
                 } catch (e) {
