@@ -1,0 +1,137 @@
+name: Mirror Offsets
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'   # ~every 6 hours; offset minute reduces collisions
+  workflow_dispatch:
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fetch FFlags.hpp (dev.imtheo -> offsets.imtheo -> workers.dev)
+        run: |
+          mkdir -p data
+          UA="Retro-Mirror/1.0"
+          SOURCES=(
+            "https://dev.imtheo.lol/Offsets/FFlags.hpp"
+            "https://offsets.imtheo.lol/FFlags.hpp"
+            "https://offsets.ntgetwritewatch.workers.dev/FFlags.hpp"
+          )
+          ok=0
+          for url in "${SOURCES[@]}"; do
+            echo "Trying $url ..."
+            if curl -fsSL --max-time 30 -A "$UA" -o data/FFlags.hpp.new "$url"; then
+              # Sanity check: must contain FFlagOffsets (both formats have it),
+              # a FFlagList struct (Format A nested or Format B flat), AND a sane
+              # number of offsets. The offset-count guard rejects truncated/stub
+              # dumps â€” e.g. a broken dumper mid-Roblox-update returning only the
+              # 3 FFlagList struct offsets â€” which would otherwise nuke the mirror
+              # and collapse the badge to "3".
+              count=$(grep -c "uintptr_t" data/FFlags.hpp.new || echo 0)
+              if [ "$count" -ge 500 ] \
+                 && grep -q "namespace FFlagOffsets" data/FFlags.hpp.new \
+                 && { grep -q "namespace FFlagList" data/FFlags.hpp.new \
+                      || grep -q "uintptr_t\s\+FFlagList" data/FFlags.hpp.new; }; then
+                echo "OK from $url ($(wc -c < data/FFlags.hpp.new) bytes, $count offsets)"
+                mv data/FFlags.hpp.new data/FFlags.hpp
+                ok=1
+                break
+              else
+                echo "WARN: response from $url failed sanity check ($count offsets)"
+                rm -f data/FFlags.hpp.new
+              fi
+            else
+              echo "WARN: curl failed for $url"
+            fi
+          done
+          if [ "$ok" -ne 1 ]; then
+            echo "ERROR: all sources failed"
+            exit 1
+          fi
+
+      - name: Fetch FFlags.json (dev.imtheo -> offsets.imtheo -> workers.dev)
+        run: |
+          UA="Retro-Mirror/1.0"
+          SOURCES=(
+            "https://dev.imtheo.lol/Offsets/FFlags.json"
+            "https://offsets.imtheo.lol/FFlags.json"
+            "https://offsets.ntgetwritewatch.workers.dev/FFlags.json"
+          )
+          ok=0
+          for url in "${SOURCES[@]}"; do
+            echo "Trying $url ..."
+            if curl -fsSL --max-time 30 -A "$UA" -o data/FFlags.json.new "$url"; then
+              # Sanity check: valid JSON with a sane "Total Offsets" count
+              # (>=500). Rejects stub dumps (e.g. "Total Offsets": 3) served by a
+              # broken dumper mid-Roblox-update.
+              if python3 -c "import json,sys; d=json.load(open('data/FFlags.json.new')); n=d.get('Total Offsets'); assert isinstance(n, int) and n >= 500"; then
+                echo "OK from $url ($(wc -c < data/FFlags.json.new) bytes)"
+                mv data/FFlags.json.new data/FFlags.json
+                ok=1
+                break
+              else
+                echo "WARN: response from $url failed sanity check"
+                rm -f data/FFlags.json.new
+              fi
+            else
+              echo "WARN: curl failed for $url"
+            fi
+          done
+          if [ "$ok" -ne 1 ]; then
+            echo "WARN: all JSON sources failed; skipping badge update"
+          fi
+
+      - name: Generate Shields endpoint badge JSON
+        run: |
+          if [ ! -f data/FFlags.hpp ]; then
+            echo "No FFlags.hpp; skipping badge generation."
+            exit 0
+          fi
+          mkdir -p badges
+          python3 - <<'PY'
+          import json, re, pathlib
+          text = pathlib.Path("data/FFlags.hpp").read_text(errors="ignore")
+          # Derive the count from the committed HPP (source of truth) rather than
+          # FFlags.json â€” workers.dev's JSON has no "Total Offsets" key, and the
+          # HPP is already offset-count-validated by the fetch step above.
+          total = len(re.findall(r"uintptr_t\s+\w+\s*=", text))
+          # Subtract the FFlagList struct members (Format A nested block) so the
+          # badge reflects modifiable flags, not internal struct offsets.
+          m = re.search(r"namespace FFlagList\s*\{(.*?)\}", text, re.S)
+          struct = len(re.findall(r"uintptr_t\s+\w+\s*=", m.group(1))) if m else 0
+          n = max(total - struct, 0)
+          message = f"{n // 1000}k+" if n >= 1000 else str(n)
+          badge = {
+              "schemaVersion": 1,
+              "label": "Modifiable FFlags",
+              "message": message,
+              "color": "blue",
+              "cacheSeconds": 900,
+          }
+          pathlib.Path("badges/fflags.json").write_text(
+              json.dumps(badge, indent=2) + "\n"
+          )
+          print(f"Wrote badges/fflags.json: {message} (flags {n}, total {total}, struct {struct})")
+          PY
+
+      - name: Commit if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/FFlags.hpp data/FFlags.json badges/fflags.json 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No change since last run."
+          else
+            git commit -m "chore(mirror): refresh offsets + badge [skip ci]"
+            git push origin main
+          fi
