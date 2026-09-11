@@ -67,7 +67,7 @@ def test_optional_checkbox_captions_present():
 def test_no_logs_checkbox_or_not_optional_copy():
     text = _iss_text()
     lower = text.lower()
-    assert "Logs â€” always removed" not in text
+    assert "Logs — always removed" not in text
     assert "Logs - always removed" not in text
     assert "this is not optional" not in lower
     assert re.search(r"Caption\s*:= '[^']*Logs", text) is None

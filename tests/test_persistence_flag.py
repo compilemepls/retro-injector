@@ -38,7 +38,7 @@ class TestPersistenceFlag(unittest.TestCase):
 
     def test_foreign_build_dirty_marker_ignored(self):
         # A dirty marker stamped with a DIFFERENT build's signature is
-        # treated as no signal â€” the user has updated and we don't carry
+        # treated as no signal — the user has updated and we don't carry
         # over a prior release's dirty state.
         path = Path(self.tmp) / '.log_state'
         path.write_bytes(b'X1' + b'\x00' * 8)

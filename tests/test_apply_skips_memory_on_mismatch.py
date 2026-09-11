@@ -2,7 +2,7 @@
 
 Before this fix, `apply_flags_hybrid` proceeded to Step 2 (live memory
 writes) even when the loaded offsets targeted a different Roblox build than
-the running process Ã¢â‚¬â€ the loader logged `[!] VERSION MISMATCH ... may fail
+the running process — the loader logged `[!] VERSION MISMATCH ... may fail
 or crash` and the apply engine wrote to wrong RVAs anyway, crashing Roblox
 on the next frame. This test asserts the guard now short-circuits Step 2
 when a mismatch is detected, keeping JSON writes intact.
@@ -72,7 +72,7 @@ def fm():
 
 def test_apply_skips_memory_when_offsets_target_different_build(fm, monkeypatch):
     """Roblox running is `version-90f2fdd...`, offsets loaded target
-    `version-ad5d3e...`. Live memory writes MUST NOT run Ã¢â‚¬â€ RVAs are for the
+    `version-ad5d3e...`. Live memory writes MUST NOT run — RVAs are for the
     wrong build and would crash the process."""
     monkeypatch.setattr(RobloxManager, "apply_fflags_json",
                         staticmethod(_StubRoblox.apply_fflags_json))
@@ -80,7 +80,7 @@ def test_apply_skips_memory_when_offsets_target_different_build(fm, monkeypatch)
                         staticmethod(lambda: "version-90f2fddd3b244ff6"))
     monkeypatch.setattr(offset_loader, "last_source_build",
                         lambda: "version-ad5d3e2906444472")
-    # Real is_version_mismatch will return True for these Ã¢â‚¬â€ no need to stub.
+    # Real is_version_mismatch will return True for these — no need to stub.
 
     stub = _StubRoblox()
     stub.running_build = "version-90f2fddd3b244ff6"
@@ -112,13 +112,13 @@ def test_apply_runs_memory_when_offsets_target_matches_running_build(fm, monkeyp
     # At LEAST open_process_for_write / get_roblox_base / scan_live_flags
     # should have been visited before the loop early-exits on empty results.
     assert _StubRoblox.memory_calls >= 1, (
-        "Step 2 must run when offsets align Ã¢â‚¬â€ got zero memory calls, "
+        "Step 2 must run when offsets align — got zero memory calls, "
         "which suggests the guard misfired."
     )
 
 
 def test_apply_guard_never_blocks_when_installed_unknown(fm, monkeypatch):
-    """`is_version_mismatch(None, X)` returns False by contract Ã¢â‚¬â€ a missing
+    """`is_version_mismatch(None, X)` returns False by contract — a missing
     installed build must NEVER cause the guard to swallow legitimate applies.
     Preserves behaviour for headless test scenarios where no Roblox exists."""
     monkeypatch.setattr(RobloxManager, "apply_fflags_json",
@@ -132,5 +132,5 @@ def test_apply_guard_never_blocks_when_installed_unknown(fm, monkeypatch):
     stub.running_build = "unknown"
     fm.apply_flags_hybrid(stub, skip_json=False)
 
-    # is_version_mismatch("unknown", "version-something") == False Ã¢â€ â€™ guard doesn't trip.
+    # is_version_mismatch("unknown", "version-something") == False → guard doesn't trip.
     assert _StubRoblox.memory_calls >= 1

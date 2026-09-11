@@ -18,7 +18,7 @@ def test_parse_launch_uri_non_protocol_returns_empty():
 
 
 def test_parse_launch_uri_roblox_scheme():
-    # roblox: (not just roblox-player:) must parse too Ã¢â‚¬â€ Froststrap registers both.
+    # roblox: (not just roblox-player:) must parse too — Froststrap registers both.
     d = bs.parse_launch_uri("roblox:1+launchmode:play+channel:production")
     assert d["launchmode"] == "play"
     assert d["channel"] == "production"

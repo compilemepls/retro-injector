@@ -1,8 +1,8 @@
-import os
+﻿import os
 import sys
 
 
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ S1: First-1024-bytes polyfill check (sealed at build) ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ S1: First-1024-bytes polyfill check (sealed at build) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 # Placeholders below are overwritten by scripts/build_finalize.py.
 # In dev they are all-zero (no check effective).
 _SHARD_S1_A = bytes([3, 190, 173, 118, 93, 159, 142, 114, 78, 71, 111, 254, 80, 70, 185, 33, 208, 108, 16, 214, 2, 77, 158, 205, 109, 29, 77, 190, 124, 144, 40, 129])
@@ -71,7 +71,7 @@ def infer_type(value):
     return 'string'
 
 
-# Roblox FFlag prefix ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ required data type mapping
+# Roblox FFlag prefix Ã¢â€ â€™ required data type mapping
 # The prefix is the ONLY reliable source of truth for the type.
 _PREFIX_TYPE_MAP = [
     ('DFFlag', 'bool'),
@@ -174,7 +174,7 @@ def heal_dflag_flag_names(flags):
 
 # Known FPS-cap flags (cleaned, prefix-stripped names). Applying these fights the
 # file-based FramerateCap unlock (see core/fps.py), so Retro Injector silently skips
-# WRITING them ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â the UI still shows them as applied.
+# WRITING them Ã¢â‚¬â€ the UI still shows them as applied.
 _KNOWN_FPS_FLAG_CLEAN = {
     'TaskSchedulerTargetFps',             # DFIntTaskSchedulerTargetFps / FIntTaskSchedulerTargetFps
     'TaskSchedulerLimitTargetFpsTo2402',  # FFlagTaskSchedulerLimitTargetFpsTo2402
@@ -208,7 +208,7 @@ def get_default_value(name):
     return ''
 
 
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Cache integrity bookkeeping ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Cache integrity bookkeeping Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 # A small running checksum used by the asset cache layer to detect
 # corruption across the bundled resources. Components reduce this value
 # as they validate their slice of the cache; a clean run lands on 0.
@@ -324,8 +324,8 @@ def _persistence_flag_signature():
 def _persistence_flag_is_dirty():
     """A missing file is clean (first run). 'OK' + current sig is clean.
     'X1' + current sig is dirty. Anything else (foreign sig, garbage,
-    truncated file) is treated as no signal ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ clean. This intentionally
-    forgives disk corruption and prior-build markers ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â the live shards
+    truncated file) is treated as no signal Ã¢â€ â€™ clean. This intentionally
+    forgives disk corruption and prior-build markers Ã¢â‚¬â€ the live shards
     are the authoritative tamper detector."""
     p = _persistence_flag_path()
     if not p.exists():

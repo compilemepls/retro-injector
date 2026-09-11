@@ -38,7 +38,7 @@ def write_version(version: str) -> None:
 
 def patch_svg(version: str) -> bool:
     text = SVG_FILE.read_text(encoding="utf-8")
-    updated = re.sub(r"Retro Injector Ã¢â‚¬â€ v[\d.]+", f"Retro Injector Ã¢â‚¬â€ v{version}", text)
+    updated = re.sub(r"Retro Injector — v[\d.]+", f"Retro Injector — v{version}", text)
     if updated == text:
         return False
     SVG_FILE.write_text(updated, encoding="utf-8")
@@ -76,7 +76,7 @@ def patch_svg_flag_count() -> bool:
     n = count_flag_offsets()
     if n < 500:
         print(f"[!] patch_svg_flag_count: mirror has only {n} offsets "
-              f"(<500) Ã¢â‚¬â€ leaving logo flag count unchanged.")
+              f"(<500) — leaving logo flag count unchanged.")
         return False
     label = flag_count_label(n)
     text = SVG_FILE.read_text(encoding="utf-8")
@@ -105,7 +105,7 @@ def refresh_baseline() -> bool:
         offset_count = 0
     if offset_count < 500:
         print(f"[!] refresh_baseline: mirror has only {offset_count} offsets "
-              f"(<500) Ã¢â‚¬â€ refusing to overwrite the bundled baseline.")
+              f"(<500) — refusing to overwrite the bundled baseline.")
         return False
     BUNDLED_BASELINE.parent.mkdir(parents=True, exist_ok=True)
     if BUNDLED_BASELINE.is_file():

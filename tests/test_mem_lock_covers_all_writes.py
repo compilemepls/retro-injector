@@ -10,7 +10,7 @@ threading.RLock()``). Historically, the "preset-switch crash" was traced
 to exactly this race.
 
 A future edit that introduces a new bare write call without wrapping it
-will fail this test â€” the crash class stays gone.
+will fail this test — the crash class stays gone.
 """
 
 from __future__ import annotations
@@ -85,7 +85,7 @@ def _call_is_under_mem_lock(tree, target_lineno):
         if isinstance(cur, ast.With):
             for item in cur.items:
                 ctx = item.context_expr
-                # `with _mem_lock:` â€” a bare Name context.
+                # `with _mem_lock:` — a bare Name context.
                 if isinstance(ctx, ast.Name) and ctx.id == "_mem_lock":
                     return True
         cur = parent_of.get(id(cur))
@@ -118,6 +118,6 @@ def test_every_low_level_write_sits_inside_mem_lock():
         + "\n  ".join(f"L{ln}: {attr} in {fn}()" for ln, attr, fn in offenders)
         + "\n\nWrap the call in `with _mem_lock:` (or route it through a "
         "wrapper that does). Two threads writing the same page without the "
-        "lock produce torn writes that corrupt Roblox memory â€” historical "
+        "lock produce torn writes that corrupt Roblox memory — historical "
         "preset-switch crash class."
     )

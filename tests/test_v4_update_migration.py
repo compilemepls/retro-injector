@@ -2,7 +2,7 @@
 
 Verifies that the (identical) v3.3.8 updater logic detects v4 and finds the
 installer asset, and that v4 reads a v3.3.8 settings.json (signed with the old
-build's rotated HMAC key) without breaking Ã¢â‚¬â€ re-signing transparently.
+build's rotated HMAC key) without breaking — re-signing transparently.
 """
 import json
 

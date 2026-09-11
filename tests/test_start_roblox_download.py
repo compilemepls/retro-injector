@@ -1,4 +1,4 @@
-"""Tests for Api.start_roblox_download.
+﻿"""Tests for Api.start_roblox_download.
 
 The download decision now targets Roblox's LATEST production build (via the
 Roblox CDN's ClientVersion endpoint) rather than whatever the offset dump
@@ -89,7 +89,7 @@ def test_worker_downloads_latest_production_not_offsets_target(api, monkeypatch,
                         staticmethod(lambda: []))
     monkeypatch.setattr(deployment, "get_latest_production_guid",
                         lambda: "version-newLATEST")
-    # Offset dump targets a DIFFERENT older build than roblox latest ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â the
+    # Offset dump targets a DIFFERENT older build than roblox latest Ã¢â‚¬â€ the
     # download must ignore this and follow Roblox CDN's truth.
     monkeypatch.setattr(offset_loader, "fetch_latest_build",
                         lambda: "version-STALE_mirror")
@@ -131,7 +131,7 @@ def test_download_never_downgrades_when_installed_is_ahead_of_offsets(api, monke
     """Fishstrap scenario: bootstrapper installed a NEWER Roblox than the
     offset dump targets. Old code would `blocked_downgrade` or (worse)
     downgrade to the stale mirror build. New code targets `latest_production`
-    ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â if installed already equals latest, we're `already_matching` and DO
+    Ã¢â‚¬â€ if installed already equals latest, we're `already_matching` and DO
     NOT touch Roblox even though offsets are stale."""
     monkeypatch.setattr(RobloxManager, "get_roblox_version_string",
                         staticmethod(lambda: "version-newLATEST"))
@@ -145,7 +145,7 @@ def test_download_never_downgrades_when_installed_is_ahead_of_offsets(api, monke
     result = api.start_roblox_download()
 
     assert result["state"] == "already_matching", (
-        "Must NOT downgrade even when offsets target an older build ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â "
+        "Must NOT downgrade even when offsets target an older build Ã¢â‚¬â€ "
         "Roblox rejects clients too far behind. "
         f"Got: {result!r}"
     )

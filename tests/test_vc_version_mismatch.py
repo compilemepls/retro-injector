@@ -32,7 +32,7 @@ def test_card_aligned_when_all_three_match():
 
 def test_card_offsets_lagging_when_user_already_on_latest():
     # User is on CDN latest; dump still names an older build. A Roblox
-    # download cannot help â€” this is the flicker the Advanced card used
+    # download cannot help — this is the flicker the Advanced card used
     # to paint as "fixed" then snap back to mismatch.
     assert fixer.classify_version_card(
         "version-LATEST", "version-OLD-DUMP", "version-LATEST") == "offsets_lagging"

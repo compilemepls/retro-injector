@@ -6,9 +6,9 @@ arrows (U+2192), box-drawing, non-Latin scripts, or emoji.
 The prior implementation called `print(formatted_msg)` directly. Any
 caller that logged a message with non-ASCII would (a) crash their own
 call path, (b) propagate the exception out to unrelated error handlers
-that would misclassify the failure â€” notably the ad-network probe was
+that would misclassify the failure — notably the ad-network probe was
 observed to catch a print() UnicodeEncodeError raised during its own
-success log and report `[net-probe] UNREACHABLE â€” unclassified network
+success log and report `[net-probe] UNREACHABLE — unclassified network
 failure`, contradicting the already-logged REACHABLE line.
 
 Fix: `_safe_print` catches UnicodeEncodeError / OSError and falls back
@@ -59,7 +59,7 @@ class TestSafePrint(unittest.TestCase):
 
     def test_safe_print_both_stages_can_fail(self):
         """If both the raw and ascii-fallback print() raise, we still
-        must not propagate â€” the logger is best-effort."""
+        must not propagate — the logger is best-effort."""
         with mock.patch('builtins.print',
                         side_effect=[UnicodeEncodeError('c', 'x', 0, 1,
                                                        'r'),

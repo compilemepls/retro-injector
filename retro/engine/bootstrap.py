@@ -1,4 +1,4 @@
-"""
+﻿"""
 bootstrap.py - lightweight join/launch logic shared by the standalone
 bootstrapper stub (bootstrap.pyw) and Retro Injector's own protocol handoff (main.pyw).
 
@@ -68,7 +68,7 @@ def _restore_third_party_if_transient():
     """If Retro Injector only seized the launcher transiently to fix a third-party
     bootstrapper's version (Take-over-only-for-the-fix), hand the handler back now
     that the fix+launch is done, so the NEXT click routes through the bootstrapper
-    again (with its mods). Best-effort ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â a failure never blocks the join."""
+    again (with its mods). Best-effort Ã¢â‚¬â€ a failure never blocks the join."""
     try:
         from retro.utils.config import Config
         from retro.engine.version_changer import bootstrapper
@@ -76,7 +76,7 @@ def _restore_third_party_if_transient():
         backup = s.get('_rbx_handler_backup')
         primary = (backup.get(bootstrapper._PRIMARY_SCHEME)
                    if isinstance(backup, dict) else backup)
-        # Only restore when the backed-up handler is a THIRD-PARTY bootstrapper ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â
+        # Only restore when the backed-up handler is a THIRD-PARTY bootstrapper Ã¢â‚¬â€
         # a stock/none backup means the user opted Retro Injector in as the persistent handler.
         if primary and bootstrapper.classify_handler(primary) == "third_party":
             bootstrapper.restore(backup)

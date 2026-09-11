@@ -1,4 +1,4 @@
-"""v4.0.4: dev-mode diagnostic that self-reports why the four ad slots
+﻿"""v4.0.4: dev-mode diagnostic that self-reports why the four ad slots
 may or may not render, straight into the Retro Injector console panel. Lets us
 diagnose "no ads" without DevTools."""
 import unittest
@@ -38,7 +38,7 @@ class TestSlotVerdict(unittest.TestCase):
 
 
 class TestReportSlotDiagnosticNeverRaises(unittest.TestCase):
-    """Backend endpoint must be crash-safe for any garbage payload ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â
+    """Backend endpoint must be crash-safe for any garbage payload Ã¢â‚¬â€
     it's a diagnostic, not a critical path."""
 
     def _shell_api(self):

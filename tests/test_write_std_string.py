@@ -65,6 +65,6 @@ def test_sso_boundary_15_vs_16(monkeypatch):
 def test_multibyte_counts_utf8_bytes_not_chars(monkeypatch):
     m, calls = _mgr(monkeypatch)
     # 8 multibyte chars = 16 UTF-8 bytes -> heap branch -> JSON_ONLY.
-    ok, msg = m._write_std_string(0x30, "Ã©" * 8)
+    ok, msg = m._write_std_string(0x30, "é" * 8)
     assert ok is False and msg.startswith("JSON_ONLY")
     assert calls == []

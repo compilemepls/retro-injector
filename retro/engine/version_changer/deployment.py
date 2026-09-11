@@ -1,7 +1,7 @@
 """Resolve the latest Roblox *production* player build GUID (version-xxxx).
 
 Used by bootstrapper mode (Phase 4) and as a sanity source. Production channel
-only Ã¢â‚¬â€ we never query other channels.
+only — we never query other channels.
 """
 
 from __future__ import annotations
@@ -26,7 +26,7 @@ _TIMEOUT = 10
 # The log line is rate-limited to at most once per cooldown so the
 # console doesn't fill with "x60/min" collapse counts during outages.
 _CACHE_TTL_OK = 300.0     # 5 min on success
-_CACHE_TTL_FAIL = 30.0    # 30 s on failure Ã¢â‚¬â€ back off, don't hammer
+_CACHE_TTL_FAIL = 30.0    # 30 s on failure — back off, don't hammer
 _LOG_COOLDOWN = 60.0      # one warn per minute max
 
 _CACHE_LOCK = threading.Lock()
@@ -89,7 +89,7 @@ def get_latest_production_guid() -> Optional[str]:
         if _CACHE['ts'] > 0.0 and age < ttl:
             return cached_guid
 
-    # Network work OUTSIDE the lock Ã¢â‚¬â€ 10 s timeouts must not block other
+    # Network work OUTSIDE the lock — 10 s timeouts must not block other
     # callers behind us.
     data = _http_get_json(_CLIENT_VERSION_JSON)
     guid = None
@@ -99,7 +99,7 @@ def get_latest_production_guid() -> Optional[str]:
         guid = _valid(_http_get_text(_SETUP_VERSION_TEXT))
 
     # Publish result. If two threads both raced past the cache and both
-    # fetched, whichever grabs the lock last wins Ã¢â‚¬â€ either result is
+    # fetched, whichever grabs the lock last wins — either result is
     # equally valid (Roblox's CDN returns the same GUID for both).
     should_log = False
     with _CACHE_LOCK:

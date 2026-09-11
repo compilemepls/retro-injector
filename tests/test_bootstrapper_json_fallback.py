@@ -1,11 +1,11 @@
 """Regression guard for the bootstrapper JSON merge fallback.
 
 When a user has ONLY a bootstrapper install (Fishstrap / Bloxstrap /
-Froststrap / Voidstrap / Plexity Ã¢â‚¬â€ no stock Roblox), `apply_fflags_json`
+Froststrap / Voidstrap / Plexity — no stock Roblox), `apply_fflags_json`
 used to short-circuit with `[-] JSON: No Roblox version directories found`
 because `get_writable_version_dirs` deliberately excludes bootstrapper
 dirs. The apply then fell straight to Step 2 (live memory), which crashed
-whenever offsets were stale Ã¢â‚¬â€ the exact "crash after applying flags"
+whenever offsets were stale — the exact "crash after applying flags"
 report the North American users hit.
 
 New behaviour: when stock is empty, fall back to the most-recent
@@ -40,7 +40,7 @@ def _read_settings(vdir):
 
 
 def test_falls_back_to_bootstrapper_when_stock_dirs_empty(isolated_dirs, monkeypatch):
-    """No stock install exists Ã¢â€ â€™ Retro Injector must merge into the bootstrapper dir."""
+    """No stock install exists → Retro Injector must merge into the bootstrapper dir."""
     monkeypatch.setattr(RobloxManager, "get_writable_version_dirs",
                         staticmethod(lambda: []))
     monkeypatch.setattr(RobloxManager, "get_all_roblox_version_dirs",
@@ -57,7 +57,7 @@ def test_falls_back_to_bootstrapper_when_stock_dirs_empty(isolated_dirs, monkeyp
 
 
 def test_bootstrapper_fallback_merges_existing_flags(isolated_dirs, monkeypatch):
-    """User configured flags through the bootstrapper's own UI Ã¢â‚¬â€ that
+    """User configured flags through the bootstrapper's own UI — that
     ClientAppSettings.json exists. Retro Injector must PRESERVE the bootstrapper's
     entries and layer its own on top (Retro Injector wins on key conflict)."""
     # Pre-seed the bootstrapper's own settings file
@@ -117,7 +117,7 @@ def test_stock_dir_still_wins_when_present(isolated_dirs, monkeypatch):
 
 
 def test_returns_false_when_no_dirs_exist_at_all(isolated_dirs, monkeypatch):
-    """No stock install, no bootstrapper install Ã¢â‚¬â€ nothing to do. Return
+    """No stock install, no bootstrapper install — nothing to do. Return
     a clean error rather than crashing on some downstream path."""
     monkeypatch.setattr(RobloxManager, "get_writable_version_dirs",
                         staticmethod(lambda: []))

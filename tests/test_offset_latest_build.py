@@ -1,4 +1,4 @@
-from retro.engine import offsets
+﻿from retro.engine import offsets
 
 
 def test_fetch_latest_build_returns_embedded_clientversion(monkeypatch):
@@ -115,7 +115,7 @@ def test_load_known_flag_names_seeds_last_source_build(monkeypatch):
 
 
 def test_load_known_flag_names_does_not_clobber_prior_source_build(monkeypatch):
-    """load_offsets is authoritative ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â if it already ran and recorded a build,
+    """load_offsets is authoritative Ã¢â‚¬â€ if it already ran and recorded a build,
     a subsequent load_known_flag_names call (e.g. a UI refresh) must not
     overwrite that value with whatever it happens to fetch."""
     # Arrange: pretend load_offsets already ran with a specific build.
@@ -143,7 +143,7 @@ def test_load_known_flag_names_falls_back_to_disk_cache_build(monkeypatch, tmp_p
     # Arrange: no network AND no bundled baseline, but a disk cache with a
     # source_build_version header. Both stubs are needed because
     # `_fetch_body_via_chain` treats the bundled baseline as a network-adjacent
-    # last-resort BEFORE returning empty ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â without stubbing it, the real
+    # last-resort BEFORE returning empty Ã¢â‚¬â€ without stubbing it, the real
     # PyInstaller resource path serves back the shipped FFlags.hpp and the
     # disk-cache branch never runs.
     offsets.reset_cache()

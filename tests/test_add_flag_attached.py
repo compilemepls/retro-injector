@@ -2,7 +2,7 @@
 
 get_live_flag_address returns a LIST of address entries; add_flag previously
 indexed it as a dict (addr_data['abs_addr']), raising TypeError whenever Roblox
-was attached and the flag was mappable Ã¢â‚¬â€ so adds "didn't work" in-game."""
+was attached and the flag was mappable — so adds "didn't work" in-game."""
 import threading
 
 from retro.interface.bridge import Api

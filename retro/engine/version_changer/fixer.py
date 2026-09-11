@@ -250,14 +250,14 @@ def disk_space_precheck(packages, versions_root, cache_dirs):
         temp_dir = tempfile.gettempdir()
         if shutil.disk_usage(temp_dir).free < need_temp * margin:
             return (
-                f"Not enough free disk space to download the update Ã¢â‚¬â€ about "
+                f"Not enough free disk space to download the update — about "
                 f"{_format_mb(need_temp * margin)} is needed on the drive holding "
                 f"temporary files. Free up some space and try again."
             )
         target = versions_root if os.path.exists(versions_root) else os.path.dirname(versions_root)
         if target and shutil.disk_usage(target).free < need_final * margin:
             return (
-                f"Not enough free disk space to install Roblox Ã¢â‚¬â€ about "
+                f"Not enough free disk space to install Roblox — about "
                 f"{_format_mb(need_final * margin)} is needed where Roblox lives. "
                 f"Free up some space and try again."
             )
@@ -275,8 +275,8 @@ def run_upgrade(target_guid: str, versions_root: str, cache_dirs: list,
     after every package is in place. A crash/cancel before commit discards the
     staging dir, leaving the real install untouched.
 
-    progress(done_packages, total_packages, package_name) Ã¢â‚¬â€ optional callback.
-    should_cancel() -> bool Ã¢â‚¬â€ optional; checked before each package.
+    progress(done_packages, total_packages, package_name) — optional callback.
+    should_cancel() -> bool — optional; checked before each package.
 
     Returns {'ok': bool, 'state': str, 'final_path': str|None, 'message': str}.
     Success states (ok=True): 'installed' (fresh install completed),

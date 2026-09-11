@@ -7,7 +7,7 @@ from retro.utils.logger import log
 from retro.utils import helpers as _helpers_pm
 
 
-# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ S4: index.html script-tag region check (sealed at build) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+# ─── S4: index.html script-tag region check (sealed at build) ───
 _SHARD_S4_A = bytes([52, 207, 60, 41, 224, 56, 180, 243, 116, 80, 21, 130, 247, 250, 176, 97, 85, 188, 238, 184, 37, 72, 141, 53, 192, 164, 133, 98, 113, 249, 248, 15])
 _SHARD_S4_B = bytes([216, 28, 244, 147, 28, 182, 134, 234, 225, 117, 179, 41, 88, 72, 23, 180, 22, 73, 155, 190, 87, 142, 76, 107, 250, 235, 1, 166, 38, 45, 178, 245])
 _SHARD_S4_EXPECTED = None
@@ -47,7 +47,7 @@ def _shard_s4_check():
         _helpers_pm._rot_subtract(601)
 
 
-# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ R2: preset corruption rot vector Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+# ─── R2: preset corruption rot vector ───
 import random as _random_r2
 import copy as _copy_r2
 

@@ -2,7 +2,7 @@
 
 Per package: reuse an already-present copy (correct MD5) from the existing
 install/cache when possible; otherwise fetch from the weighted CDN list with
-retries and HTTPS->HTTP fallback. Nothing is committed here Ã¢â‚¬â€ see installer.py.
+retries and HTTPS->HTTP fallback. Nothing is committed here — see installer.py.
 """
 
 from __future__ import annotations
@@ -17,10 +17,10 @@ from retro.utils.logger import log
 #
 # Every entry serves the same S3-backed object under `*.rbxcdn.com` (verified
 # by matching `x-amz-version-id` headers), so a checksum mismatch across
-# entries would imply someone MITM'd the TLS handshake Ã¢â‚¬â€ the manifest MD5
+# entries would imply someone MITM'd the TLS handshake — the manifest MD5
 # verify at download_package() would then catch it and force a retry.
 #
-# `roblox-setup.cachefly.net` used to serve here but Roblox retired it Ã¢â‚¬â€
+# `roblox-setup.cachefly.net` used to serve here but Roblox retired it —
 # hitting it now returns "Hostname not configured". Removed to avoid one
 # guaranteed-404 round-trip per download attempt.
 CDN_BASES = [

@@ -6,7 +6,7 @@ import uuid
 from pathlib import Path
 
 
-# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Settings integrity (HMAC over ads_enabled || version || install_id) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+# ─── Settings integrity (HMAC over ads_enabled || version || install_id) ───
 # Shard A lives here; Shard B is contributed by api.py at module import time.
 _HMAC_SHARD_A = bytes([224, 164, 215, 39, 107, 189, 15, 231, 248, 71, 138, 113, 80, 194, 131, 144, 143, 184, 59, 158, 64, 192, 126, 236, 54, 163, 129, 153, 173, 116, 45, 166])
 _HMAC_SHARD_B = bytes(32)
@@ -33,11 +33,11 @@ def _hmac_fingerprint():
     return hashlib.sha256(_hmac_key()).hexdigest()[:16]
 
 
-# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Settings HMAC watchdog: session-lifetime health tracker Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+# ─── Settings HMAC watchdog: session-lifetime health tracker ───
 # Frontend calls _hmac_health_tick() every few seconds with the current
 # integrity state. If the integrity signal is absent for a rolling 60-second
 # window (after a 15 s startup grace), the watchdog trips and stays tripped
-# for the session Ã¢â‚¬â€ gates in flags.apply_flags_hybrid and
+# for the session — gates in flags.apply_flags_hybrid and
 # roblox.write_flag_at_address then refuse the operation as an "HMAC
 # mismatch" so the app degrades until the user restarts.
 import time as _hmac_time
@@ -149,7 +149,7 @@ class Config:
         "watchdog_interval": 5.0,
         "enforce_all_flags": True,
         # Flag enforcement mode: "turbo" (default, tight ~50ms loop with
-        # read-before-write change detection Ã¢â‚¬â€ corrects a reverted flag
+        # read-before-write change detection — corrects a reverted flag
         # near-instantly) or "watchdog" (periodic, lighter).
         "enforcement_mode": "turbo",
         "sort_mode": "custom",
@@ -161,7 +161,7 @@ class Config:
         # Scheduled Apply (B2): seconds to wait after Roblox is detected before
         # the live memory injection runs. 0 = off (apply immediately). When > 0
         # the startup ClientAppSettings.json write is skipped so the delay is
-        # real (startup-only flags won't apply Ã¢â‚¬â€ surfaced in the UI note).
+        # real (startup-only flags won't apply — surfaced in the UI note).
         "scheduled_apply_delay": 0,
         # Pointer-history rollover: keeps N old offsets_cache versions so
         # users on an older Roblox build can fall back to a matching pointer set.
@@ -214,7 +214,7 @@ class Config:
         except Exception:
             return cls.DEFAULT_SETTINGS.copy()
 
-        # Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Update migration Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+        # ─── Update migration ───
         # Each release rotates the HMAC key. If the stored fingerprint differs
         # from the current build's fingerprint, this is a legitimate update,
         # not tamper. Re-sign with the new key transparently. The user never
@@ -265,7 +265,7 @@ class Config:
             return True
         stored_fp = blob.pop('_key_fp', None)
         # If the stored fingerprint is missing or from a different build, the
-        # signature is necessarily invalid Ã¢â‚¬â€ but it's not tamper. load_settings
+        # signature is necessarily invalid — but it's not tamper. load_settings
         # will have already triggered a re-sign on the next call.
         if stored_fp != _hmac_fingerprint():
             return True

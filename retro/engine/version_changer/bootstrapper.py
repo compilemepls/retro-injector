@@ -155,7 +155,7 @@ def repair_scheme() -> bool:
     A key that has shell\\open\\command but is missing the 'URL Protocol' marker is
     NOT recognized as a URL scheme by browsers, so clicking Play silently does
     nothing. This rewrites only the base marker values, leaving the command (i.e.
-    who owns the handler) untouched Ã¢â‚¬â€ so it does NOT seize the handler and is safe
+    who owns the handler) untouched — so it does NOT seize the handler and is safe
     to run even when Automatic Launch is off. Idempotent. Returns True if it
     repaired anything."""
     repaired = False
@@ -181,7 +181,7 @@ def register(handler_exe: str, script: Optional[str] = None) -> dict:
 
     `handler_exe` is the launcher (RetroInjector.exe when frozen, or the Python interpreter
     when running from source). `script` MUST be supplied for a source run (the
-    main.pyw path) Ã¢â‚¬â€ otherwise the handler would run the interpreter with no script
+    main.pyw path) — otherwise the handler would run the interpreter with no script
     and silently fail. Returns a {scheme: backed-up-command-or-None} map for a
     faithful restore."""
     if script:
@@ -203,8 +203,8 @@ def restore(backup) -> None:
     """Restore previously backed-up handler commands, or delete Retro Injector's keys when
     there was nothing to restore.
 
-    Accepts the {scheme: command} map from register(), or Ã¢â‚¬â€ for backward
-    compatibility with a previously persisted value Ã¢â‚¬â€ a single legacy command
+    Accepts the {scheme: command} map from register(), or — for backward
+    compatibility with a previously persisted value — a single legacy command
     string / None (applied to the primary scheme)."""
     if backup is None or isinstance(backup, str):
         backup = {_PRIMARY_SCHEME: backup}  # legacy single-value form

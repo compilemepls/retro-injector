@@ -1,7 +1,7 @@
-"""Regression guard for the hotkey-loop version-mismatch fix (Ãƒâ€šÃ‚Â§3.5).
+﻿"""Regression guard for the hotkey-loop version-mismatch fix (Ã‚Â§3.5).
 
 Before this fix, the hotkey loop called ``write_flag_at_address`` directly
-whenever a bound key toggled ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â no version-mismatch check. If the running
+whenever a bound key toggled Ã¢â‚¬â€ no version-mismatch check. If the running
 Roblox was on a build the loaded offsets didn't target, the write hit
 random RVAs and crashed the game.
 
@@ -71,7 +71,7 @@ def test_not_gated_when_offsets_agree_with_running_pid(fm, monkeypatch):
 
 def test_not_gated_when_running_pid_unknown(fm, monkeypatch):
     """A ``QueryFullProcessImageNameW`` failure returns ``"unknown"`` from
-    the manager. That must NEVER cause a false-alarm skip ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â pass-through."""
+    the manager. That must NEVER cause a false-alarm skip Ã¢â‚¬â€ pass-through."""
     _patch_versions(monkeypatch, "version-something")
     fm._rm = _StubRoblox(running_build="unknown")
 
@@ -82,7 +82,7 @@ def test_not_gated_when_running_pid_unknown(fm, monkeypatch):
 
 def test_not_gated_when_rm_detached(fm, monkeypatch):
     """Roblox closed between apply and the next hotkey tick. The guard
-    must fall through ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â the hotkey loop's own ``is_attached`` check will
+    must fall through Ã¢â‚¬â€ the hotkey loop's own ``is_attached`` check will
     handle the "no process" case."""
     _patch_versions(monkeypatch, "version-A")
 
@@ -151,7 +151,7 @@ def test_predicate_shape_matches_hotkey_call_sites():
         return False
 
     calls = collect_write_calls_with_guards(hotkey_fn)
-    assert calls, "test setup mismatch ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â no write_flag_at_address calls found"
+    assert calls, "test setup mismatch Ã¢â‚¬â€ no write_flag_at_address calls found"
     unguarded = [ln for ln, guarded in calls if not guarded]
     assert not unguarded, (
         f"write_flag_at_address at lines {unguarded} is NOT under a "

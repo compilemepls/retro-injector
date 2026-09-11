@@ -23,7 +23,7 @@ def test_precheck_passes_with_plenty_of_space(tmp_path, monkeypatch):
 
 def test_precheck_fails_when_temp_drive_full(tmp_path, monkeypatch):
     _no_cache(monkeypatch)
-    # Only 10 MB free everywhere â€” far less than the ~320 MB needed.
+    # Only 10 MB free everywhere — far less than the ~320 MB needed.
     monkeypatch.setattr(fixer.shutil, "disk_usage", lambda p: Usage(0, 0, 10 * 1024**2))
     msg = fixer.disk_space_precheck(PACKAGES, str(tmp_path), [])
     assert msg is not None

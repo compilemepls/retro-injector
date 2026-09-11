@@ -69,7 +69,7 @@ def _launch_installer_and_exit(setup_path):
 
     Returns False if the launch failed so the caller can keep running (UAC
     cancel, missing file, etc.). On success this never returns in production
-    Ã¢â‚¬â€ ``os._exit(0)`` runs immediately so Setup can replace RetroInjector.exe.
+    — ``os._exit(0)`` runs immediately so Setup can replace RetroInjector.exe.
     """
     import ctypes
     result = ctypes.windll.shell32.ShellExecuteW(
@@ -92,7 +92,7 @@ def download_update(exe_url, new_version, progress_callback=None):
     approach wrote a batch script and spawned it with ``DETACHED_PROCESS``,
     which stripped the interactive session token from the child. The Inno
     Setup installer installs into Program Files (``{autopf}``) and therefore
-    needs UAC elevation Ã¢â‚¬â€ a detached-cmd child has no station/desktop for the
+    needs UAC elevation — a detached-cmd child has no station/desktop for the
     consent prompt, so elevation silently failed and the installer never ran.
     ``ShellExecuteW("open", ...)`` routes through Explorer, which owns the
     user's interactive session and handles elevation correctly.

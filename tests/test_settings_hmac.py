@@ -99,7 +99,7 @@ class TestHmacKeyRotationMigration(unittest.TestCase):
             self.assertTrue(config.Config.verify_settings_integrity())
 
     def test_tamper_under_same_key_is_still_caught(self):
-        # Same key throughout â€” a hand edit should fail integrity.
+        # Same key throughout — a hand edit should fail integrity.
         with mock.patch.object(config, '_hmac_key',
                                return_value=b'\x11' * 32):
             config.Config.save_settings({'ads_enabled': True})
@@ -111,7 +111,7 @@ class TestHmacKeyRotationMigration(unittest.TestCase):
             self.assertFalse(config.Config.verify_settings_integrity())
 
     def test_legacy_settings_missing_key_fp_field_accepted(self):
-        # Pre-migration settings â€” no _key_fp â€” should be accepted (one-time
+        # Pre-migration settings — no _key_fp — should be accepted (one-time
         # grace; the next save adds the field).
         legacy_blob = {'ads_enabled': True, 'sort_mode': 'name'}
         with open(config.Config.SETTINGS_FILE, 'w') as f:

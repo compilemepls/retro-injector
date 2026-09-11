@@ -60,7 +60,7 @@ class TestWatchdogNeutralized(unittest.TestCase):
             self.assertFalse(config._hmac_watchdog_tripped())
 
     def test_mixed_true_false_sequence_never_trips(self):
-        """Even hostile mix â€” one True then 500 False â€” must not trip."""
+        """Even hostile mix — one True then 500 False — must not trip."""
         t = [3000.0]
         with mock.patch.object(config._hmac_time, 'time',
                                side_effect=lambda: t[0]):

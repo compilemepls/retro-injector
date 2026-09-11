@@ -9,7 +9,7 @@ version loop); the handler reads it and, when it says "already up to date and
 fresh", launches Roblox immediately with no network round-trips.
 
 Safety: this is a pure fast-path. Any miss, staleness, or error makes callers
-fall back to the full (network) check Ã¢â‚¬â€ it can never block or break a join.
+fall back to the full (network) check — it can never block or break a join.
 """
 import json
 import os
@@ -27,7 +27,7 @@ TTL_SECONDS = 600  # 10 minutes
 
 def write_known_good(installed: str, latest: str) -> None:
     """Record that, as of now, the installed build is `installed` and the latest
-    production build is `latest`. Best-effort Ã¢â‚¬â€ never raises."""
+    production build is `latest`. Best-effort — never raises."""
     try:
         with open(PATH, "w", encoding="utf-8") as f:
             json.dump(

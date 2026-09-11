@@ -1,742 +1,1483 @@
 """Centralized FFlag offset loader with multi-source fallback chain.
 
+
+
 Sources tried in order (first valid wins). Each network URL is attempted
+
 via Python requests first, then via system curl.exe (bypasses AV SSL
+
 interception):
-  1. dev.imtheo.lol      (preferred ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â latest dumper)
-  2. offsets.imtheo.lol  (stable mirror ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â same format/content as dev)
-  3. offsets.ntgetwritewatch.workers.dev (alt mirror ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Format B)
+
+  1. dev.imtheo.lol      (preferred — latest dumper)
+
+  2. offsets.imtheo.lol  (stable mirror — same format/content as dev)
+
+  3. offsets.ntgetwritewatch.workers.dev (alt mirror — Format B)
+
   4. GitHub mirror (data/FFlags.hpp)
+
   5. Disk cache (~/.FFlagManager/offsets_cache.json)
+
   6. Bundled baseline shipped with the .exe
 
+
+
 Defensive parsing: treat remote body as untrusted (size cap, regex, RVA ranges,
+
 ASCII names). A body is only treated as "valid" if it parses to at least
-MIN_VALID_FLAGS entries AND has a FFlagList.Pointer struct offset ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â this
+
+MIN_VALID_FLAGS entries AND has a FFlagList.Pointer struct offset — this
+
 prevents AV captive portals and proxy error pages (which return 200 OK HTML)
+
 from poisoning the disk cache.
+
 """
+
+
 
 from __future__ import annotations
 
+
+
 import json
+
 import os
+
 import re
+
 import shutil
+
 import time
+
 from typing import Optional
 
+
+
 from retro.utils.logger import log
+
 from retro.utils.helpers import clean_flag_name, infer_type_from_name
+
 from retro.utils.paths import user_data_dir
+
 from retro.engine import sources
+
 from retro.engine.sources import (
+
     PRIMARY_NETWORK_SOURCES,
+
     SRC_DISK_CACHE,
+
     SRC_BUNDLED,
+
 )
+
+
 
 SRC_MANUAL = "manual_offsets"
 
 
-# ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ paths ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬
+
+
+
+# ───────────────────────── paths ─────────────────────────
+
+
 
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 CACHE_PATH = os.path.join(user_data_dir(), "offsets_cache.json")
+
 _LEGACY_CACHE_PATH = os.path.join(_REPO_ROOT, "offsets_cache.json")
+
 MANUAL_OFFSETS_DIR = os.path.join(user_data_dir(), "offsets")
+
 MANUAL_OFFSETS_FILE = os.path.join(MANUAL_OFFSETS_DIR, "FFlags.hpp")
 
+
+
 # Pointer-history rollover: keep the previous N offsets_cache files so users
+
 # on an older Roblox build can fall back to a matching pointer set.
+
 _HISTORY_MAX = 10  # absolute upper bound; user setting is clamped to this
+
 _HISTORY_PREFIX = "offsets_cache_v"
 
+
+
 def _history_path(idx: int) -> str:
+
     return os.path.join(user_data_dir(), f"{_HISTORY_PREFIX}{idx}.json")
 
+
+
 def _pointer_history_settings() -> tuple[bool, int]:
+
     """Return (enabled, count). Defaults to (False, 3) when Config is unavailable."""
+
     try:
+
         from retro.utils.config import Config
+
         s = Config.load_settings()
+
         enabled = bool(s.get("pointer_history_enabled", False))
+
         count = int(s.get("pointer_history_count", 3))
+
         count = max(1, min(count, _HISTORY_MAX))
+
         return enabled, count
+
     except Exception:
+
         return False, 3
 
 
-# ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ safety constants ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬
+
+
+
+# ───────────────────────── safety constants ─────────────────────────
+
+
 
 IMTHEO_MAX_BYTES = 5 * 1024 * 1024
 
+
+
 RVA_MIN = 0x100000
+
 RVA_MAX = 0x10000000
 
+
+
 STRUCT_OFF_MIN = 0x100000
+
 STRUCT_OFF_MAX = 0x10000000
 
+
+
 # Captive-portal / error-page guard. A real FFlags.hpp has thousands of entries;
+
 # anything less than this threshold is almost certainly a bad fetch.
+
 MIN_VALID_FLAGS = 500
 
-# Matches BOTH formats ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â the `inline\s+constexpr\s+` prefix is optional so this
+
+
+# Matches BOTH formats — the `inline\s+constexpr\s+` prefix is optional so this
+
 # captures the imtheo `inline constexpr uintptr_t NAME = 0x...` lines AND the
+
 # workers.dev mirror's `uintptr_t NAME = 0x...` lines.
+
 _RX_UINTPTR = re.compile(
+
     rb'(?:inline\s+constexpr\s+)?uintptr_t\s+([A-Za-z_][A-Za-z0-9_]{0,127})\s*=\s*0x([0-9a-fA-F]{1,8})'
+
 )
+
+
 
 # Format A (imtheo / dev.imtheo): nested `namespace FFlagList { ... }` block.
+
 _RX_FFLAGLIST_NAMESPACE = re.compile(
+
     rb'namespace\s+FFlagList\s*\{([\s\S]{0,65536}?)\}', re.MULTILINE
+
 )
+
+
 
 # Format B (workers.dev): `namespace FFlagOffsets { uintptr_t FFlagList = ...; uintptr_t ValueGetSet = ...; uintptr_t FlagToValue = ...; }`
+
 # We capture the FFlagOffsets body to find the three sibling vars.
+
 _RX_FFLAGOFFSETS_NAMESPACE = re.compile(
+
     rb'namespace\s+FFlagOffsets\s*\{([\s\S]{0,65536}?)\}', re.MULTILINE
+
 )
 
+
+
 # Format B struct member name -> canonical (Format A) name
+
 _STRUCT_ALIASES = {
+
     "FFlagList": "Pointer",       # the actual pointer offset
+
     "ValueGetSet": "ToFlag",       # Format A calls it ToFlag
+
     "FlagToValue": "ToValue",      # Format A calls it ToValue
+
 }
 
+
+
 # Format A only: embedded ClientVersion string + header `Roblox Version:` line.
-# Format B (workers.dev) has neither ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â version returns None for those sources.
+
+# Format B (workers.dev) has neither — version returns None for those sources.
+
 _RX_CLIENT_VERSION = re.compile(rb'ClientVersion\s*=\s*"([^"]+)"')
+
 _RX_HEADER_VERSION = re.compile(rb'Roblox Version\s*:\s*(version-[0-9a-fA-F]+)')
 
 
-# ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ module cache ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬
+
+
+
+# ───────────────────────── module cache ─────────────────────────
+
+
 
 _session_cache: Optional[dict] = None
+
 _last_source_id: Optional[str] = None
+
 _last_baseline_stale: bool = False
-# Build version the offsets target (e.g. version-xxxx) from the last load ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â
+
+# Build version the offsets target (e.g. version-xxxx) from the last load —
+
 # the "needed" version shown in the UI version-status bar.
+
 _last_source_build: Optional[str] = None
 
 
+
+
+
 def reset_cache():
+
     global _session_cache, _last_source_id, _last_baseline_stale, _last_source_build
+
     _session_cache = None
+
     _last_source_id = None
+
     _last_baseline_stale = False
+
     _last_source_build = None
 
 
+
+
+
 def last_source_id() -> Optional[str]:
+
     """The source ID of the most recent successful load_offsets call."""
+
     return _last_source_id
 
 
+
+
+
 def last_source_build() -> Optional[str]:
+
     """Build version (version-xxxx) the current offsets target, or None."""
+
     return _last_source_build
 
 
+
+
+
 def is_baseline_stale() -> bool:
+
     """True if the last load came from the bundled baseline AND the embedded
+
     build version did not match the running Roblox build version.
+
     """
+
     return _last_baseline_stale
 
 
+
+
+
 def fetch_latest_build() -> Optional[str]:
+
     """Probe the NETWORK offset sources only and return the build version
+
     (version-xxxx) the upstream dump currently targets, or None if every
+
     network source fails or none embed a version.
 
+
+
     Used by the 'Fix Roblox' offsets-first step to learn whether the upstream
+
     dumper has caught up to the user's installed Roblox build. Does not need a
+
     process base and does not mutate the loaded offset cache.
+
     """
+
     for _sid, fetch in _iter_network_sources():
+
         body = fetch()
+
         if not body:
+
             continue
+
         version = _extract_imtheo_client_version(body)
+
         if version:
+
             return version
+
     return None
 
 
-# ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ parse ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬
+
+
+
+# ───────────────────────── parse ─────────────────────────
+
+
 
 def _extract_struct_offsets(body: bytes) -> tuple[dict, bytes]:
+
     """Pull the FFlagList struct member offsets out of the body and return them
+
     plus the body with the struct region stripped (so flag parsing doesn't
+
     double-count them).
 
+
+
     Supports both formats:
+
       A) nested `namespace FFlagList { ... }`
+
       B) flat siblings inside `namespace FFlagOffsets { uintptr_t FFlagList = ...; }`
 
+
+
     Returns (struct_offsets, body_without_struct_region). struct_offsets keys
+
     are normalized to the canonical Format A names (Pointer/ToFlag/ToValue).
+
     """
+
     struct_offsets: dict[str, int] = {}
 
+
+
     # Format A: nested FFlagList namespace
+
     m_a = _RX_FFLAGLIST_NAMESPACE.search(body)
+
     if m_a:
+
         block = m_a.group(1)
+
         for nm_b, hx_b in _RX_UINTPTR.findall(block):
+
             try:
+
                 nm = nm_b.decode("ascii")
+
             except UnicodeDecodeError:
+
                 continue
+
             try:
+
                 off = int(hx_b, 16)
+
             except ValueError:
+
                 continue
+
             if STRUCT_OFF_MIN <= off <= STRUCT_OFF_MAX:
+
                 struct_offsets.setdefault(nm, off)
+
         return struct_offsets, _RX_FFLAGLIST_NAMESPACE.sub(b"", body)
 
+
+
     # Format B: siblings inside FFlagOffsets namespace. Pull only the three
+
     # known struct members so we don't pollute flag_offsets with them.
+
     m_b = _RX_FFLAGOFFSETS_NAMESPACE.search(body)
+
     if not m_b:
+
         return struct_offsets, body
+
     region = m_b.group(1)
+
     for nm_b, hx_b in _RX_UINTPTR.findall(region):
+
         try:
+
             nm = nm_b.decode("ascii")
+
         except UnicodeDecodeError:
+
             continue
+
         canonical = _STRUCT_ALIASES.get(nm)
+
         if not canonical:
+
             continue
+
         try:
+
             off = int(hx_b, 16)
+
         except ValueError:
+
             continue
+
         if STRUCT_OFF_MIN <= off <= STRUCT_OFF_MAX:
+
             struct_offsets.setdefault(canonical, off)
+
     # Strip only the FFlagOffsets namespace so we don't re-parse its members as flags.
+
     stripped = _RX_FFLAGOFFSETS_NAMESPACE.sub(b"", body)
+
     return struct_offsets, stripped
 
 
+
+
+
 def _parse_imtheo(body: bytes, base_addr: int) -> tuple[dict, dict]:
+
     """Parse FFlags.hpp body into (flag_offsets, struct_offsets). Format-agnostic."""
+
     struct_offsets, stripped = _extract_struct_offsets(body)
+
     flag_offsets: dict = {}
 
+
+
     rejected_range = 0
+
     for nm_b, hx_b in _RX_UINTPTR.findall(stripped):
+
         try:
+
             ident = nm_b.decode("ascii")
+
         except UnicodeDecodeError:
+
             continue
+
         try:
+
             rva = int(hx_b, 16)
+
         except ValueError:
+
             continue
+
         if rva < RVA_MIN or rva > RVA_MAX:
+
             rejected_range += 1
+
             continue
+
         clean = clean_flag_name(ident)
+
         if clean in flag_offsets:
+
             continue
+
         flag_offsets[clean] = {
+
             "abs_addr": base_addr + rva,
+
             "full_name": ident,
+
             "type": infer_type_from_name(ident) or "unknown",
+
             "source": "imtheo",
+
         }
 
+
+
     if rejected_range:
+
         log(f"[*] Parser: rejected {rejected_range} entries with out-of-range RVA", (180, 180, 180))
+
     return flag_offsets, struct_offsets
 
 
+
+
+
 def _parse_imtheo_known_names_only(body: bytes) -> dict[str, str]:
+
     """Build {stripped_identifier: type} for UI without a process base.
+
     Format-agnostic (strips struct region for either Format A or B).
+
     """
+
     _, stripped = _extract_struct_offsets(body)
+
     out: dict[str, str] = {}
+
     for nm_b, hx_b in _RX_UINTPTR.findall(stripped):
+
         try:
+
             ident = nm_b.decode("ascii")
+
         except UnicodeDecodeError:
+
             continue
+
         try:
+
             rva = int(hx_b, 16)
+
         except ValueError:
+
             continue
+
         if rva < RVA_MIN or rva > RVA_MAX:
+
             continue
+
         out[ident] = infer_type_from_name(ident) or "unknown"
+
     return out
 
 
+
+
+
 def _extract_imtheo_client_version(body: bytes) -> Optional[str]:
+
     m = _RX_CLIENT_VERSION.search(body)
+
     if m:
+
         try:
+
             return m.group(1).decode("ascii", errors="ignore")
+
         except Exception:
+
             return None
+
     m = _RX_HEADER_VERSION.search(body)
+
     if m:
+
         try:
+
             return m.group(1).decode("ascii", errors="ignore")
+
         except Exception:
+
             return None
+
     return None
 
 
+
+
+
 def _validate_parsed(flags: dict, structs: dict) -> bool:
+
     """Reject empty/HTML/captive-portal responses before they poison the cache."""
+
     return len(flags) >= MIN_VALID_FLAGS and bool(structs.get("Pointer"))
 
 
-# ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ source chain ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬
+
+
+
+# ───────────────────────── source chain ─────────────────────────
+
+
 
 def _try_source(
+
     source_id: str,
+
     body: Optional[bytes],
+
     base_addr: int,
+
     build_version: str,
+
 ) -> Optional[tuple[dict, dict, Optional[str]]]:
+
     """Parse a fetched body and return (flags, structs, source_build) if valid."""
+
     if not body:
+
         return None
+
     flags, structs = _parse_imtheo(body, base_addr)
+
     if not _validate_parsed(flags, structs):
+
         log(f"[!] {source_id}: parsed {len(flags)} flags (need >={MIN_VALID_FLAGS}) - rejected", (255, 200, 100))
+
         return None
+
     source_build = _extract_imtheo_client_version(body)
+
     if build_version and source_build and source_build != build_version:
+
         log(
+
             f"[!] VERSION MISMATCH ({source_id}): running '{build_version}' but source is '{source_build}'. "
+
             f"Memory applies may fail or crash.",
+
             (255, 120, 120),
+
         )
+
     return flags, structs, source_build
 
 
+
+
+
 def _iter_network_sources():
+
     """Yield (source_id, fetch_callable) for each (URL, transport) pair.
-    Tries requests, then curl, per URL ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â moving on to the next URL only after
+
+    Tries requests, then curl, per URL — moving on to the next URL only after
+
     both transports fail.
+
     """
+
     for sid_req, sid_curl, url in PRIMARY_NETWORK_SOURCES:
+
         yield sid_req, (lambda u=url: sources.fetch_via_requests(u))
+
         yield sid_curl, (lambda u=url: sources.fetch_via_curl(u))
 
 
+
+
+
 def _read_manual_offsets() -> Optional[bytes]:
+
     """Read FFlags.hpp from the user's manual offsets folder
+
     (~/.FFlagManager/offsets/FFlags.hpp). Returns None if missing/empty.
+
     """
+
     try:
+
         if not os.path.isfile(MANUAL_OFFSETS_FILE):
+
             return None
+
         with open(MANUAL_OFFSETS_FILE, "rb") as f:
+
             data = f.read(IMTHEO_MAX_BYTES + 1)
+
         if len(data) > IMTHEO_MAX_BYTES:
+
             log(f"[!] {SRC_MANUAL}: exceeds {IMTHEO_MAX_BYTES}B cap", (255, 100, 100))
+
             return None
+
         return data
+
     except Exception as e:
+
         log(f"[!] {SRC_MANUAL}: read failed ({type(e).__name__})", (255, 200, 100))
+
         return None
 
 
+
+
+
 def _load_chain(base_addr: int, build_version: str) -> tuple[dict, dict, Optional[str], str, bool]:
+
     """Iterate the source chain. Returns (flags, structs, source_build, source_id, baseline_stale)."""
 
+
+
     for sid, fetch in _iter_network_sources():
+
         body = fetch()
+
         if not body:
+
             continue
+
         log(f"[+] {sid}: {len(body)} bytes received", (100, 255, 100))
+
         result = _try_source(sid, body, base_addr, build_version)
+
         if result is not None:
+
             flags, structs, source_build = result
+
             # If the network returned pointers for a DIFFERENT Roblox build than
+
             # what the user is running, the user may be on a slower update
+
             # channel. Try the pointer-history slots for an exact build match.
+
             if (build_version and source_build and source_build != build_version
+
                     and structs.get("Pointer")):
+
                 hist_flags, hist_structs, hist_build = _load_from_history(base_addr, build_version)
+
                 if hist_flags and hist_structs.get("Pointer"):
+
                     log(
+
                         f"[+] Network returned pointers for '{source_build}' but you're on "
+
                         f"'{build_version}'; using pointer-history slot (build '{hist_build}').",
+
                         (150, 200, 255),
+
                     )
+
                     return hist_flags, hist_structs, hist_build, "pointer_history", False
+
             return flags, structs, source_build, sid, False
 
+
+
     # Manual offsets folder fallback (~/.FFlagManager/offsets/FFlags.hpp)
+
     body = _read_manual_offsets()
+
     if body:
+
         log(f"[+] {SRC_MANUAL}: {len(body)} bytes read", (100, 255, 100))
+
         result = _try_source(SRC_MANUAL, body, base_addr, build_version)
+
         if result is not None:
+
             flags, structs, source_build = result
+
             return flags, structs, source_build, SRC_MANUAL, False
 
+
+
     # Disk cache fallback
+
     flags, structs, cache_source_build = _load_from_disk_cache(base_addr, build_version)
+
     if flags and structs.get("Pointer"):
+
         # Same rescue logic if the disk cache is from a different build.
+
         if (build_version and cache_source_build and cache_source_build != build_version):
+
             hist_flags, hist_structs, hist_build = _load_from_history(base_addr, build_version)
+
             if hist_flags and hist_structs.get("Pointer"):
+
                 log(
+
                     f"[+] Disk cache is for build '{cache_source_build}'; using pointer-history "
+
                     f"slot (build '{hist_build}') instead.",
+
                     (150, 200, 255),
+
                 )
+
                 return hist_flags, hist_structs, hist_build, "pointer_history", False
+
         return flags, structs, cache_source_build, SRC_DISK_CACHE, False
 
+
+
     # Bundled baseline (last resort)
+
     body = sources.read_bundled_baseline()
+
     if body:
+
         log(f"[+] {SRC_BUNDLED}: {len(body)} bytes read", (100, 255, 100))
+
         result = _try_source(SRC_BUNDLED, body, base_addr, build_version)
+
         if result is not None:
+
             flags, structs, source_build = result
+
             stale = bool(build_version) and bool(source_build) and source_build != build_version
+
             if stale:
+
                 log(
+
                     f"[!] Bundled baseline build '{source_build}' differs from running '{build_version}'. "
+
                     f"Please update Retro Injector for offsets matching the current Roblox build.",
+
                     (255, 120, 120),
+
                 )
+
             return flags, structs, source_build, SRC_BUNDLED, stale
+
+
 
     return {}, {}, None, "", False
 
 
+
+
+
 def _fetch_body_via_chain() -> tuple[Optional[bytes], str]:
+
     """Body-only chain for `load_known_flag_names` (no process base required)."""
+
     for sid, fetch in _iter_network_sources():
+
         body = fetch()
+
         if body:
+
             return body, sid
+
     body = _read_manual_offsets()
+
     if body:
+
         return body, SRC_MANUAL
+
     body = sources.read_bundled_baseline()
+
     if body:
+
         return body, SRC_BUNDLED
+
     return None, ""
 
 
-# ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ disk cache I/O ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬
+
+
+
+# ───────────────────────── disk cache I/O ─────────────────────────
+
+
 
 def _migrate_legacy_cache_if_needed() -> None:
+
     """One-shot copy of the old in-repo cache to the per-user location."""
+
     try:
+
         if os.path.isfile(CACHE_PATH):
+
             return
+
         if not os.path.isfile(_LEGACY_CACHE_PATH):
+
             return
+
         shutil.copy2(_LEGACY_CACHE_PATH, CACHE_PATH)
+
         log(f"[*] Migrated legacy cache -> {CACHE_PATH}", (180, 180, 180))
+
     except Exception as e:
+
         log(f"[!] Cache migration failed: {type(e).__name__}", (255, 200, 100))
 
 
+
+
+
 def _rotate_history_if_needed(new_source_build: str) -> None:
+
     """Before overwriting CACHE_PATH, if the existing cache is from a DIFFERENT
+
     Roblox build AND pointer_history is enabled, rotate it into the history slot
+
     so users on an older build can still find a matching pointer set.
+
     """
+
     enabled, count = _pointer_history_settings()
+
     if not enabled:
+
         return
+
     if not os.path.isfile(CACHE_PATH):
+
         return
+
     try:
+
         with open(CACHE_PATH, "r", encoding="utf-8") as f:
+
             current = json.load(f)
+
     except Exception:
+
         return
+
     cur_source = current.get("source_build_version") or current.get("build_version") or ""
+
     if not cur_source or cur_source == new_source_build:
+
         return  # same build, no rotation needed
+
     # Shift _v1 -> _v2, _v2 -> _v3, ..., drop anything past `count`.
+
     try:
+
         # Delete the oldest slot first if it exists
+
         oldest = _history_path(count)
+
         if os.path.isfile(oldest):
+
             os.remove(oldest)
+
         # Now shift each backwards
+
         for i in range(count - 1, 0, -1):
+
             src = _history_path(i)
+
             dst = _history_path(i + 1)
+
             if os.path.isfile(src):
+
                 os.replace(src, dst)
+
         # Move CACHE_PATH -> _v1
+
         os.replace(CACHE_PATH, _history_path(1))
+
         log(f"[+] Rotated pointer cache (build {cur_source}) into history slot v1", (150, 200, 255))
+
     except Exception as e:
+
         log(f"[!] Pointer history rotation failed: {type(e).__name__}", (255, 200, 100))
 
 
+
+
+
 def _write_disk_cache(merged_flags: dict, struct_offsets: dict, build_version: str,
+
                       base_addr: int, source_build_version: Optional[str] = None) -> None:
+
     """Persist RVA map for offline warm start. Atomic via tmp + rename."""
+
     _rotate_history_if_needed(source_build_version or build_version)
+
     tmp_path = CACHE_PATH + ".tmp"
+
     try:
+
         flags_rva = {}
+
         for clean, info in merged_flags.items():
+
             rva = info["abs_addr"] - base_addr
+
             if rva < RVA_MIN or rva > RVA_MAX:
+
                 continue
+
             flags_rva[clean] = {
+
                 "rva": f"0x{rva:X}",
+
                 "full_name": info["full_name"],
+
                 "type": info["type"],
+
                 "source": info.get("source", "imtheo"),
+
             }
+
         cache = {
+
             "schema_version": 1,
+
             "source": "imtheo_only",
+
             "build_version": build_version,
+
             "source_build_version": source_build_version or "",
+
             "generated_at": int(time.time()),
+
             "struct_offsets": {k: f"0x{v:X}" for k, v in struct_offsets.items()},
+
             "flags": flags_rva,
+
         }
+
         os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
+
         with open(tmp_path, "w", encoding="utf-8") as f:
+
             json.dump(cache, f, indent=2)
+
         os.replace(tmp_path, CACHE_PATH)
+
     except Exception as e:
+
         log(f"[!] Cache write failed: {type(e).__name__}", (255, 200, 100))
+
         try:
+
             if os.path.exists(tmp_path):
+
                 os.remove(tmp_path)
+
         except OSError:
+
             pass
 
 
+
+
+
 def _load_from_disk_cache(base_addr: int, build_version: str) -> tuple[dict, dict, Optional[str]]:
+
     """Reconstruct offsets from cache. Returns (flags, structs, source_build)."""
+
     _migrate_legacy_cache_if_needed()
+
     if not os.path.isfile(CACHE_PATH):
+
         return {}, {}, None
+
     try:
+
         with open(CACHE_PATH, "r", encoding="utf-8") as f:
+
             data = json.load(f)
+
     except Exception as e:
+
         log(f"[!] Disk cache read failed: {type(e).__name__}", (255, 200, 100))
+
         return {}, {}, None
+
+
 
     struct_offsets = {}
+
     for name, hex_s in data.get("struct_offsets", {}).items():
+
         if isinstance(hex_s, str) and hex_s.startswith("0x"):
+
             try:
+
                 struct_offsets[name] = int(hex_s, 16)
+
             except ValueError:
+
                 pass
 
+
+
     flags = {}
+
     for clean, info in data.get("flags", {}).items():
+
         if not isinstance(info, dict):
+
             continue
+
         rva_s = info.get("rva", "")
+
         try:
+
             rva = int(rva_s, 16) if isinstance(rva_s, str) else int(rva_s)
+
         except (TypeError, ValueError):
+
             continue
+
         if rva < RVA_MIN or rva > RVA_MAX:
+
             continue
+
         fn = info.get("full_name", clean)
+
         flags[clean] = {
+
             "abs_addr": base_addr + rva,
+
             "full_name": fn,
+
             "type": info.get("type", infer_type_from_name(fn) or "unknown"),
+
             "source": info.get("source", "cache"),
+
         }
 
+
+
     bv = data.get("build_version", "")
+
     source_bv = data.get("source_build_version", "")
+
     if source_bv and build_version and source_bv != build_version:
+
         log(
+
             f"[!] CACHE SOURCE VERSION MISMATCH: running '{build_version}' but cached source is '{source_bv}'.",
+
             (255, 120, 120),
+
         )
+
     if bv and build_version and bv != build_version:
+
         log(
+
             f"[!] Cache build '{bv}' differs from running '{build_version}' - addresses may be wrong",
+
             (255, 200, 100),
+
         )
+
     elif flags:
+
         log(f"[+] Loaded {len(flags)} flags from disk cache", (100, 255, 200))
+
     return flags, struct_offsets, (source_bv or None)
 
 
+
+
+
 def _load_from_history(base_addr: int, build_version: str) -> tuple[dict, dict, Optional[str]]:
+
     """Walk through offsets_cache_v1.json, _v2.json, ... and return the first
+
     one whose source_build_version matches `build_version`. Empty if none match
+
     or pointer history is disabled."""
+
     enabled, count = _pointer_history_settings()
+
     if not enabled:
+
         return {}, {}, None
+
     for idx in range(1, count + 1):
+
         path = _history_path(idx)
+
         if not os.path.isfile(path):
+
             continue
+
         try:
+
             with open(path, "r", encoding="utf-8") as f:
+
                 data = json.load(f)
+
         except Exception:
+
             continue
+
         src_bv = data.get("source_build_version") or data.get("build_version") or ""
+
         if src_bv != build_version:
+
             continue
-        # Match ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â reconstruct flags/structs from this historical cache.
+
+        # Match — reconstruct flags/structs from this historical cache.
+
         struct_offsets = {}
+
         for name, hex_s in data.get("struct_offsets", {}).items():
+
             if isinstance(hex_s, str) and hex_s.startswith("0x"):
+
                 try:
+
                     struct_offsets[name] = int(hex_s, 16)
+
                 except ValueError:
+
                     pass
+
         flags = {}
+
         for clean, info in data.get("flags", {}).items():
+
             if not isinstance(info, dict):
+
                 continue
+
             rva_s = info.get("rva", "")
+
             try:
+
                 rva = int(rva_s, 16) if isinstance(rva_s, str) else int(rva_s)
+
             except (TypeError, ValueError):
+
                 continue
+
             if rva < RVA_MIN or rva > RVA_MAX:
+
                 continue
+
             fn = info.get("full_name", clean)
+
             flags[clean] = {
+
                 "abs_addr": base_addr + rva,
+
                 "full_name": fn,
+
                 "type": info.get("type", infer_type_from_name(fn) or "unknown"),
+
                 "source": info.get("source", "history"),
+
             }
+
         if flags:
+
             log(f"[+] Loaded {len(flags)} flags from pointer history slot v{idx} (build {src_bv})", (100, 255, 200))
+
             return flags, struct_offsets, src_bv
+
     return {}, {}, None
 
 
+
+
+
 def _known_names_from_disk_cache() -> tuple[dict[str, str], Optional[str]]:
+
     """UI preset list when offline: derive from cached flags only.
 
+
+
     Returns (names_by_full_ident, source_build_version_or_None). The build
+
     version comes from the cache header if present, so callers can seed the
+
     session-level "build the offsets target" marker on a warm start with no
+
     network.
+
     """
+
     _migrate_legacy_cache_if_needed()
+
     if not os.path.isfile(CACHE_PATH):
+
         return {}, None
+
     try:
+
         with open(CACHE_PATH, "r", encoding="utf-8") as f:
+
             data = json.load(f)
+
     except Exception:
+
         return {}, None
+
     out = {}
+
     for clean, info in data.get("flags", {}).items():
+
         if isinstance(info, dict):
+
             fn = info.get("full_name", clean)
+
             if isinstance(fn, str):
+
                 out[fn] = info.get("type", infer_type_from_name(fn) or "unknown")
+
     cache_build = data.get("source_build_version") or data.get("build_version") or None
+
     if not isinstance(cache_build, str) or not cache_build:
+
         cache_build = None
+
     return out, cache_build
 
 
-# ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ public API ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬
+
+
+
+# ───────────────────────── public API ─────────────────────────
+
+
 
 def load_offsets(base_addr: int, build_version: str,
+
                  user_flag_clean_names: Optional[set[str]] = None) -> tuple[dict, dict]:
+
     """Load offsets via the 6-source fallback chain.
 
+
+
     user_flag_clean_names is ignored (kept for API compatibility); always loads
+
     full source map.
+
     """
+
     global _session_cache, _last_source_id, _last_baseline_stale, _last_source_build
+
     if _session_cache is not None and _session_cache.get("base_addr") == base_addr:
+
         return _session_cache["flags"], _session_cache["structs"]
+
+
 
     flags, structs, source_build, source_id, baseline_stale = _load_chain(base_addr, build_version)
 
+
+
     _last_source_id = source_id or None
+
     _last_baseline_stale = baseline_stale
+
     _last_source_build = source_build or None
 
+
+
     if flags or structs:
+
         log(
+
             f"[OK] Offsets source: {source_id or 'none'}, "
+
             f"build={source_build or 'unknown'}, flags={len(flags)}",
+
             (100, 255, 200),
+
         )
+
     else:
+
         log("[!] All offset sources failed - Retro Injector cannot apply flags", (255, 100, 100))
+
+
 
     _session_cache = {"base_addr": base_addr, "flags": flags, "structs": structs}
 
+
+
     # Only persist when we got a fresh body. Don't echo cache back to itself
+
     # and don't persist the bundled baseline as if it were a fresh fetch.
+
     if (flags or structs) and source_id not in (SRC_DISK_CACHE, SRC_BUNDLED, ""):
+
         _write_disk_cache(flags, structs, build_version, base_addr, source_build_version=source_build)
+
+
 
     return flags, structs
 
 
+
+
+
 def load_known_flag_names() -> dict[str, str]:
+
     """Known-flag list for UI: name+type only, no process base required.
 
+
+
     Uses the same fallback chain as load_offsets for body fetch, then disk
+
     cache as a final fallback for the preset list.
 
+
+
     Side effect: seeds `_last_source_build` / `_last_source_id` from whichever
+
     source wins, so a startup that only ever calls this function still has an
+
     honest "build the offsets target" answer before the first apply/attach.
-    Never clobbers a value already set by `load_offsets` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â that path is
+
+    Never clobbers a value already set by `load_offsets` — that path is
+
     authoritative.
+
     """
+
     global _last_source_build, _last_source_id
+
     body, source_id = _fetch_body_via_chain()
+
     if body:
+
         names = _parse_imtheo_known_names_only(body)
+
         if len(names) >= MIN_VALID_FLAGS:
+
             log(f"[+] Known names from {source_id}: {len(names)}", (100, 255, 100))
+
             if _last_source_build is None:
+
                 build_version = _extract_imtheo_client_version(body)
+
                 if build_version:
+
                     _last_source_build = build_version
+
                 if not _last_source_id:
+
                     _last_source_id = source_id or None
+
             return names
+
         else:
+
             log(f"[!] {source_id}: only {len(names)} names - falling back", (255, 200, 100))
 
+
+
     fallback, cache_build = _known_names_from_disk_cache()
+
     if fallback:
+
         log(f"[+] Known names from disk cache: {len(fallback)}", (255, 200, 100))
+
         if _last_source_build is None and cache_build:
+
             _last_source_build = cache_build
+
         if not _last_source_id:
+
             _last_source_id = SRC_DISK_CACHE
+
         return fallback
 
+
+
     log("[!] No offset source returned a usable name list - UI search limited", (255, 100, 100))
+
     return {}

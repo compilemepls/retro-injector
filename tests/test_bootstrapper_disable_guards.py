@@ -1,10 +1,10 @@
-"""v4.0.4: two guards on the Roblox-handler restore path.
+﻿"""v4.0.4: two guards on the Roblox-handler restore path.
 
 Both bugs were user-invisible until a subsequent failure cascaded:
 
 1. `disable_bootstrapper` used to swallow any exception from
    `bootstrapper.restore(...)`, clear `_rbx_handler_backup`, flip
-   `roblox_fix_mode` to `launch_only`, and return `state: "disabled"` ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â
+   `roblox_fix_mode` to `launch_only`, and return `state: "disabled"` Ã¢â‚¬â€
    reporting success while the OS registry still pointed at Retro Injector AND the
    only handle to the previous handler was now `None`.
 
@@ -12,7 +12,7 @@ Both bugs were user-invisible until a subsequent failure cascaded:
    `bootstrapper.restore(self.settings.get('_rbx_handler_backup'))` with
    no presence check. Per `bootstrapper.restore(None)` that hits the
    `else` branch and `_delete_key(scheme)` fires for every Roblox scheme
-   ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â wiping the Play handler entirely.
+   Ã¢â‚¬â€ wiping the Play handler entirely.
 
 Both guards ship in v4.0.4.
 """
@@ -25,7 +25,7 @@ from retro.interface import bridge as api_module
 
 def _shell_api():
     """Minimal Api-like shell with just the fields the two methods read.
-    We bypass `Api.__init__` entirely ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â it starts background threads and
+    We bypass `Api.__init__` entirely Ã¢â‚¬â€ it starts background threads and
     touches disk in ways unrelated to what these tests verify."""
     a = api_module.Api.__new__(api_module.Api)
     a.settings = {
@@ -39,7 +39,7 @@ def _shell_api():
 
 class TestDisableBootstrapperFailurePreservesBackup(unittest.TestCase):
     def test_restore_failure_reports_error_and_keeps_backup(self):
-        """Registry-write denied ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ response state must be 'error', the
+        """Registry-write denied Ã¢â€ â€™ response state must be 'error', the
         backup must remain intact, and the fix-mode label must NOT flip
         to 'launch_only' (that would lie about the actual registry)."""
         a = _shell_api()
@@ -53,11 +53,11 @@ class TestDisableBootstrapperFailurePreservesBackup(unittest.TestCase):
         self.assertIn('Could not restore', result['message'])
         # Backup MUST still be present for retry.
         self.assertEqual(a.settings['_rbx_handler_backup'], original_backup)
-        # Fix mode MUST stay 'bootstrapper' ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â registry unchanged.
+        # Fix mode MUST stay 'bootstrapper' Ã¢â‚¬â€ registry unchanged.
         self.assertEqual(a.settings['roblox_fix_mode'], 'bootstrapper')
 
     def test_restore_success_clears_backup_and_reports_disabled(self):
-        """Happy path: successful restore ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ success shape, backup cleared."""
+        """Happy path: successful restore Ã¢â€ â€™ success shape, backup cleared."""
         a = _shell_api()
         with mock.patch('retro.interface.bridge.Config.save_settings'), \
              mock.patch('retro.engine.version_changer.bootstrapper.restore'):
@@ -90,7 +90,7 @@ class TestAutoVersionOnceReciprocalRestoreGuard(unittest.TestCase):
             m_restore.assert_not_called()
 
     def test_present_backup_still_restores(self):
-        """The guard must NOT block the happy path ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â a real backup still
+        """The guard must NOT block the happy path Ã¢â‚¬â€ a real backup still
         triggers restore."""
         a = _shell_api()
         a.settings['auto_launch_enabled'] = False
@@ -108,7 +108,7 @@ class TestAutoVersionOnceReciprocalRestoreGuard(unittest.TestCase):
 
 def _reciprocal_branch_only(self):
     """Isolated copy of the reciprocal-restore block from
-    `Api._auto_version_once` ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â exactly the lines that carried the bug.
+    `Api._auto_version_once` Ã¢â‚¬â€ exactly the lines that carried the bug.
     Tracks bootstrapper.py's public API and matches the shipped source."""
     from retro.engine.version_changer import bootstrapper
     from retro.utils.config import Config

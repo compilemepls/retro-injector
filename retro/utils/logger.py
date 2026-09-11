@@ -6,12 +6,12 @@ from datetime import datetime
 import os
 from pathlib import Path
 
-# Windows consoles default to cp1252 or cp437 depending on locale Ã¢â‚¬â€ neither
+# Windows consoles default to cp1252 or cp437 depending on locale — neither
 # can encode arrows, box-drawing, non-Latin, or emoji. A single non-ASCII
 # character in ANY log message then raises UnicodeEncodeError inside
 # print() and (worse) whatever caller emitted the log sees the exception
 # and can misclassify the situation (e.g. the ad-network probe caught the
-# charmap error and reported "UNREACHABLE Ã¢â‚¬â€ unclassified network
+# charmap error and reported "UNREACHABLE — unclassified network
 # failure"). Reconfiguring stdout/stderr to UTF-8 with errors='replace'
 # once at import time makes prints safe forever. Python 3.7+.
 try:
@@ -62,17 +62,27 @@ class Logger:
         self._tail_epoch = 0
         self.lock = threading.Lock()
         
-        # Setup file logging
+        # Setup file logging — use an explicit UTF-8 FileHandler so em-dashes,
+        # bullets, and other non-ASCII punctuation survive on Windows (the
+        # default logging FileHandler uses cp1252, which mangles them).
         log_dir = Path(os.path.expanduser("~")) / ".FFlagManager" / "logs"
         log_dir.mkdir(parents=True, exist_ok=True)
         log_file = log_dir / "fflag_manager.log"
 
-        logging.basicConfig(
-            filename=str(log_file),
-            level=logging.INFO,
-            format='%(asctime)s - %(levelname)s - %(message)s',
-            filemode='a'
+        _file_handler = logging.FileHandler(
+            str(log_file), mode='a', encoding='utf-8', errors='replace'
         )
+        _file_handler.setLevel(logging.INFO)
+        _file_handler.setFormatter(
+            logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        )
+        _root = logging.getLogger()
+        _root.setLevel(logging.INFO)
+        # Replace any pre-existing handlers (e.g. from a prior import) so we
+        # don't end up with duplicate file writes.
+        for _h in list(_root.handlers):
+            _root.removeHandler(_h)
+        _root.addHandler(_file_handler)
         _shard_s6_start_thread()
 
     @classmethod
@@ -85,7 +95,7 @@ class Logger:
     def log(self, message, color=(255, 255, 255), level="INFO"):
         timestamp = datetime.now().strftime("%H:%M:%S")
 
-        # File/Console log Ã¢â‚¬â€ always record every raw event on disk (dedupe is
+        # File/Console log — always record every raw event on disk (dedupe is
         # a UI-only concern; the file log stays complete for debugging).
         if level == "INFO":
             logging.info(message)
@@ -97,7 +107,7 @@ class Logger:
         with self.lock:
             if message == self._last_core and self.console_log:
                 # Back-to-back duplicate with a visible previous entry:
-                # mutate the tail in place. Do NOT bump `_total` Ã¢â‚¬â€ the total
+                # mutate the tail in place. Do NOT bump `_total` — the total
                 # counts APPENDS, not mutations; bumping it here would shift
                 # every earlier entry's implicit sequence number forward and
                 # cause `get_logs_since` to re-emit entries the client had
@@ -133,7 +143,7 @@ class Logger:
           (a dedup collapse fired since `since_tail_epoch`), the tail
           entry alone is returned so the client's most-recent line is
           replaced with the fresh " xN" version.
-        - `total_seq` is the append-only monotonic counter Ã¢â‚¬â€ safe to use
+        - `total_seq` is the append-only monotonic counter — safe to use
           as the client's cursor without any dedup-induced drift.
         """
         with self.lock:
@@ -143,7 +153,7 @@ class Logger:
         start = total - len(buf)          # sequence number of buf[0]
         offset = since_seq - start
         if offset < 0:
-            offset = 0                    # caller missed dropped lines Ã¢â‚¬â€ resync
+            offset = 0                    # caller missed dropped lines — resync
         new = buf[offset:]
         if not new and buf and tail_epoch > since_tail_epoch:
             # Nothing appended, but the tail was mutated (dedup). Return
@@ -178,7 +188,7 @@ def get_logs_since(since_seq, since_tail_epoch=0):
     return Logger.get_instance().get_logs_since(since_seq, since_tail_epoch)
 
 
-# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ S6: periodic polyfill re-check (sealed at build) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+# ─── S6: periodic polyfill re-check (sealed at build) ───
 import hashlib as _hashlib_s6
 from retro.utils import helpers as _helpers_s6
 

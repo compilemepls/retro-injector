@@ -29,14 +29,14 @@ def settings_path():
 
 def set_framerate_cap(text, value=UNLOCK_FPS_VALUE):
     """Return `text` with FramerateCap set to `value`. Replaces an existing entry,
-    or inserts one just inside <Properties> if absent. Pure â€” easy to unit test."""
+    or inserts one just inside <Properties> if absent. Pure — easy to unit test."""
     if _CAP_RE.search(text):
         return _CAP_RE.sub(rf"\g<1>{value}\g<2>", text)
     m = re.search(r"(<Properties>[^\n]*\n)", text)
     if m:
         insert = f'\t\t\t<int name="FramerateCap">{value}</int>\n'
         return text[:m.end()] + insert + text[m.end():]
-    return text  # no place to put it â€” leave unchanged
+    return text  # no place to put it — leave unchanged
 
 
 def is_unlocked(text, value=UNLOCK_FPS_VALUE):
@@ -71,7 +71,7 @@ def unlock_fps():
             with open(path, "w", encoding="utf-8") as f:
                 f.write(new_text)
         os.chmod(path, stat.S_IREAD)  # lock so Roblox can't revert it
-        cleared_readonly = False       # successful lock â€” finally is a no-op
+        cleared_readonly = False       # successful lock — finally is a no-op
         return True, f"FramerateCap={UNLOCK_FPS_VALUE} (read-only)"
     except Exception as e:
         return False, str(e)
@@ -79,7 +79,7 @@ def unlock_fps():
         # Never leave the file writable after we cleared the read-only bit.
         # Without this, a write failure between `chmod(IWRITE)` and the
         # final `chmod(IREAD)` would let Roblox overwrite FramerateCap on
-        # exit â€” the FPS unlock would silently regress with no user signal.
+        # exit — the FPS unlock would silently regress with no user signal.
         if cleared_readonly:
             try:
                 os.chmod(path, stat.S_IREAD)
@@ -92,7 +92,7 @@ def restore_fps():
     Roblox (and the user's own FPS-cap flags) can write FramerateCap again.
 
     Used when the FPS-unlocker setting is turned OFF. We deliberately do NOT
-    reset the cap value â€” Roblox rewrites it from its own settings on next launch
+    reset the cap value — Roblox rewrites it from its own settings on next launch
     once the file is writable. Idempotent and best-effort; returns
     (changed: bool, message: str).
     """

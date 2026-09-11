@@ -8,11 +8,11 @@ from retro.interface.bridge import Api
 from retro.utils.helpers import get_resource_path
 from retro.utils.logger import log
 
-# SHA-256 of the shipped intersection-polyfill.js Ã¢â‚¬â€ used for tamper detection
+# SHA-256 of the shipped intersection-polyfill.js — used for tamper detection
 _AD_SCRIPT_HASH = '52675de38984c21befa4d6ddc9b4457a31d57286757f7559c9340dc693864038'
 
 
-# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ S2: full-file polyfill validation (sealed at build) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+# ─── S2: full-file polyfill validation (sealed at build) ───
 import hashlib as _hashlib
 from retro.utils import helpers as _s2_helpers
 
@@ -52,13 +52,13 @@ def _shard_s2_check():
         _s2_helpers._rot_subtract(523)
 
 
-# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+# ─────────────────────────────────────────────────────────────────────────
 #  Host-level navigation guard: block any top-level navigation that would
 #  replace the local app UI with an external URL. WebView2's
 #  NavigationStarting fires only for top-level frame navigation, so we can
 #  cancel unwanted host-replacing navigations without interfering with any
 #  nested iframe content.
-# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+# ─────────────────────────────────────────────────────────────────────────
 import time as _nav_time
 import webbrowser as _nav_webbrowser
 
@@ -75,7 +75,7 @@ def _nav_uri_is_external(uri):
     except Exception:
         return False
     if not (low.startswith('http://') or low.startswith('https://')):
-        return False  # file:, about:, data:, blank, ms-* Ã¢â€ â€™ local app, allow
+        return False  # file:, about:, data:, blank, ms-* → local app, allow
     try:
         host = low.split('://', 1)[1].split('/', 1)[0].split(':', 1)[0]
     except Exception:
@@ -86,7 +86,7 @@ def _nav_uri_is_external(uri):
 def _install_nav_guard():
     """Wrap pywebview's EdgeChromium NavigationStarting handler so top-level
     navigation to an external URL is cancelled. Fails safe: any problem just
-    leaves the original handler in place Ã¢â‚¬â€ the app never breaks from this."""
+    leaves the original handler in place — the app never breaks from this."""
     global _NAV_GUARD_INSTALLED
     if _NAV_GUARD_INSTALLED:
         return
@@ -139,7 +139,7 @@ def _install_nav_guard():
                 return
         except Exception:
             pass
-        # Internal navigation (the app's own page) Ã¢â€ â€™ original behaviour.
+        # Internal navigation (the app's own page) → original behaviour.
         try:
             return _orig(self, sender, args)
         except Exception:
@@ -236,7 +236,7 @@ class MainWindow:
 
         If tray creation or `Icon.run()` raises (Windows shell issue, AV block,
         pystray backend crash, etc.), we log the error AND force-show the main
-        window when it was started hidden Ã¢â‚¬â€ otherwise the user is left with a
+        window when it was started hidden — otherwise the user is left with a
         running Retro Injector process that has NO UI at all (invisible zombie).
         """
         try:
@@ -251,7 +251,7 @@ class MainWindow:
                 menu
             )
         except Exception as e:
-            log(f"[!] Tray icon init failed: {e} Ã¢â‚¬â€ forcing window visible",
+            log(f"[!] Tray icon init failed: {e} — forcing window visible",
                 (255, 100, 100))
             self.tray_icon = None
             self._force_window_visible()
@@ -262,10 +262,10 @@ class MainWindow:
                 self.tray_icon.run()
             except Exception as e:
                 # Runtime failure inside pystray's message loop. If the window
-                # was started hidden the user now has no way to interact Ã¢â‚¬â€ pop
+                # was started hidden the user now has no way to interact — pop
                 # it into view instead of leaving a silent zombie process.
                 try:
-                    log(f"[!] Tray icon crashed: {e} Ã¢â‚¬â€ forcing window visible",
+                    log(f"[!] Tray icon crashed: {e} — forcing window visible",
                         (255, 100, 100))
                 except Exception:
                     pass
@@ -314,7 +314,7 @@ class MainWindow:
 
     def run(self):
         """Start the pywebview event loop (blocking)."""
-        # Ad-containment host guards Ã¢â‚¬â€ install BEFORE the webview starts so the
+        # Ad-containment host guards — install BEFORE the webview starts so the
         # patched NavigationStarting handler is bound on the EdgeChrome instance.
         _install_nav_guard()
         try:

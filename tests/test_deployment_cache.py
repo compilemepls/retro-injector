@@ -4,7 +4,7 @@ Roblox's CDN or fill the console with "x60/min" warning collapses.
 
 Contract locked in here:
 - A positive result is cached for `_CACHE_TTL_OK` (5 min).
-- A negative result is cached for `_CACHE_TTL_FAIL` (30 s) â€” no hammer.
+- A negative result is cached for `_CACHE_TTL_FAIL` (30 s) — no hammer.
 - The warning log fires at most once per `_LOG_COOLDOWN` (60 s).
 - Cross-thread callers serialize through `_CACHE_LOCK`.
 """
@@ -35,7 +35,7 @@ class TestResolverCache(unittest.TestCase):
             self.assertEqual(m_json.call_count, 1)
             second = deployment.get_latest_production_guid()
             self.assertEqual(second, 'version-abc123')
-            # No additional HTTP calls â€” cache hit.
+            # No additional HTTP calls — cache hit.
             self.assertEqual(m_json.call_count, 1)
             self.assertEqual(m_text.call_count, 0)
 
@@ -49,7 +49,7 @@ class TestResolverCache(unittest.TestCase):
             self.assertIsNone(first)
             self.assertEqual(m_json.call_count, 1)
             self.assertEqual(m_text.call_count, 1)
-            # 20 rapid retries within the 30 s failure TTL â€” none re-fetch.
+            # 20 rapid retries within the 30 s failure TTL — none re-fetch.
             for _ in range(20):
                 self.assertIsNone(deployment.get_latest_production_guid())
             self.assertEqual(m_json.call_count, 1)
@@ -100,11 +100,11 @@ class TestResolverCache(unittest.TestCase):
             for _ in range(10):
                 deployment.get_latest_production_guid()
                 t[0] += deployment._CACHE_TTL_FAIL + 1.0
-            # Only ceil(10 * 31 / 60) â‰ˆ 6 log calls would appear if the
+            # Only ceil(10 * 31 / 60) ≈ 6 log calls would appear if the
             # cooldown weren't there. With the cooldown at 60 s and each
             # cycle spending 31 s of wall time, at most one log per 2
-            # cycles â€” â‰¤ 6 log calls, and the exact count is bounded.
-            # Loose upper bound is enough â€” the point is that it's not 10.
+            # cycles — ≤ 6 log calls, and the exact count is bounded.
+            # Loose upper bound is enough — the point is that it's not 10.
             self.assertLessEqual(len(log_calls), 6)
             # And it must have logged at least once (the first cycle).
             self.assertGreaterEqual(len(log_calls), 1)

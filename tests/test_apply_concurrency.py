@@ -1,7 +1,7 @@
 """Preset-switch / apply crash fix.
 
 Two guarantees:
-1. RobloxManager._write_raw serializes via _mem_lock Ã¢â‚¬â€ two threads can never be
+1. RobloxManager._write_raw serializes via _mem_lock — two threads can never be
    inside the real write (VirtualProtectEx/WriteProcessMemory) at once.
 2. FlagManager._applying brackets apply_flags_hybrid so the watchdog stands down
    for the whole apply (and is always reset, even on early-return / exception).
@@ -14,7 +14,7 @@ from retro.engine import roblox as rm_mod
 from retro.engine.flags import FlagManager
 
 
-# Ã¢â€â‚¬Ã¢â€â‚¬ 1. write lock serialization Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+# ── 1. write lock serialization ──────────────────────────────────────────────
 
 def test_mem_lock_exists():
     assert hasattr(rm_mod, "_mem_lock")
@@ -48,7 +48,7 @@ def test_write_raw_is_serialized(monkeypatch):
     assert state["max"] == 1
 
 
-# Ã¢â€â‚¬Ã¢â€â‚¬ 2. _applying brackets the apply (watchdog stand-down) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+# ── 2. _applying brackets the apply (watchdog stand-down) ─────────────────────
 
 class _FakeRM:
     def __init__(self, fm, attached=False):

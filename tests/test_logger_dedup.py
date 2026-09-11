@@ -6,7 +6,7 @@ appended. `get_logs_since(since)` derived `start = total - len(buf)`, so
 after N dedups `start` advanced by N and previously-buffered non-tail
 entries got re-emitted with `replace=False`. The frontend appended them
 again, then the tail's `replace=True` only dropped the newly-duplicated
-tail â€” leaving 2Ã— copies of every intermediate entry visible.
+tail — leaving 2× copies of every intermediate entry visible.
 
 Fix: dedup no longer bumps `_total`; it bumps `_tail_epoch` instead.
 `get_logs_since` returns `(logs, total, tail_epoch)`; when nothing new was
@@ -21,7 +21,7 @@ from retro.utils import logger
 
 
 def _fresh_logger():
-    """Bypass the singleton â€” needed so tests are independent and don't
+    """Bypass the singleton — needed so tests are independent and don't
     inherit state from prior in-process consumers."""
     lg = logger.Logger.__new__(logger.Logger)
     lg.console_log = deque(maxlen=1000)
@@ -42,10 +42,10 @@ class TestDedupReplayInvariant(unittest.TestCase):
             lg.log(m)
         _, total1, epoch1 = lg.get_logs_since(0, 0)
         self.assertEqual(total1, 4)
-        # 3 back-to-back D's â€” dedup fires each time.
+        # 3 back-to-back D's — dedup fires each time.
         lg.log('D'); lg.log('D'); lg.log('D')
         new, total2, epoch2 = lg.get_logs_since(total1, epoch1)
-        # Total must NOT have advanced â€” no new append.
+        # Total must NOT have advanced — no new append.
         self.assertEqual(total2, total1)
         self.assertGreater(epoch2, epoch1)
         # Exactly ONE entry returned: the mutated tail with replace=True.
@@ -55,7 +55,7 @@ class TestDedupReplayInvariant(unittest.TestCase):
 
     def test_client_up_to_date_gets_nothing_on_repeated_polls(self):
         """Once the client's cursor matches, subsequent polls with no
-        activity are empty â€” no drift, no re-emit."""
+        activity are empty — no drift, no re-emit."""
         lg = _fresh_logger()
         lg.log('X'); lg.log('Y')
         _, total, epoch = lg.get_logs_since(0, 0)
@@ -95,7 +95,7 @@ class TestDedupReplayInvariant(unittest.TestCase):
         lg = _fresh_logger()
         lg.log('X')
         lg.clear_logs()
-        # After clear, _last_core is reset â€” so this should append, not
+        # After clear, _last_core is reset — so this should append, not
         # dedup. But even if a hypothetical future refactor left
         # _last_core set, the guard `and self.console_log` protects us.
         lg.log('X')
@@ -106,7 +106,7 @@ class TestDedupReplayInvariant(unittest.TestCase):
         self.assertEqual(epoch, 0)
 
     def test_get_logs_since_backward_compat_default_epoch(self):
-        """Legacy callers using the single-arg form still work â€” since
+        """Legacy callers using the single-arg form still work — since
         default `since_tail_epoch=0`, a mutation always signals as
         `epoch > 0` when the tail was ever mutated."""
         lg = _fresh_logger()

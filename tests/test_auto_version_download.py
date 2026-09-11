@@ -1,8 +1,8 @@
-"""Regression guard for the auto-download trigger inside _auto_version_once.
+﻿"""Regression guard for the auto-download trigger inside _auto_version_once.
 
 Every ~5 minutes the background version loop checks whether the installed
 Roblox build lags Roblox's latest production build and, if so, kicks off
-`start_roblox_download` in the background ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â no user prompt, no UI. These
+`start_roblox_download` in the background Ã¢â‚¬â€ no user prompt, no UI. These
 tests fence the trigger behaviour so future edits don't silently drop the
 auto-update path.
 """
@@ -34,7 +34,7 @@ def _stub_common(monkeypatch):
     _auto_version_once's non-download branches don't touch real state."""
     import retro.interface.bridge as api_module
     monkeypatch.setattr(api_module, "get_current_version", lambda: "test")
-    # fastpath is invoked at the end of _auto_version_once ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â neuter it.
+    # fastpath is invoked at the end of _auto_version_once Ã¢â‚¬â€ neuter it.
     from retro.engine.version_changer import fastpath, fixer
     monkeypatch.setattr(fastpath, "write_known_good", lambda *_a, **_k: None)
     # Never delete real Roblox folders from a unit test.
@@ -49,7 +49,7 @@ def _stub_common(monkeypatch):
 
 def test_auto_version_triggers_download_when_installed_lags_latest(api, monkeypatch):
     """Installed build != latest_production, Roblox not running, no fix
-    already in flight ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ the auto tick MUST spawn a download worker."""
+    already in flight Ã¢â€ â€™ the auto tick MUST spawn a download worker."""
     _stub_common(monkeypatch)
     monkeypatch.setattr(RobloxManager, "get_roblox_version_string",
                         staticmethod(lambda: "version-installedOLD"))
@@ -71,7 +71,7 @@ def test_auto_version_triggers_download_when_installed_lags_latest(api, monkeypa
 
 
 def test_auto_version_skips_download_when_installed_equals_latest(api, monkeypatch):
-    """Installed already matches latest_production ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ no download, but leftover
+    """Installed already matches latest_production Ã¢â€ â€™ no download, but leftover
     folders are still cleared."""
     _stub_common(monkeypatch)
     from retro.engine.version_changer import fixer
@@ -95,7 +95,7 @@ def test_auto_version_skips_download_when_installed_equals_latest(api, monkeypat
 
 
 def test_auto_version_skips_download_when_roblox_is_running(api, monkeypatch):
-    """Never yank Roblox out from under the user ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â if the process is live,
+    """Never yank Roblox out from under the user Ã¢â‚¬â€ if the process is live,
     defer to the next tick."""
     _stub_common(monkeypatch)
     monkeypatch.setattr(RobloxManager, "get_roblox_version_string",
@@ -143,7 +143,7 @@ def test_auto_version_does_not_prune_when_roblox_is_running(api, monkeypatch):
 
 
 def test_auto_version_skips_download_when_fix_already_running(api, monkeypatch):
-    """A worker is already in flight ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â don't stack a second one on top."""
+    """A worker is already in flight Ã¢â‚¬â€ don't stack a second one on top."""
     _stub_common(monkeypatch)
     monkeypatch.setattr(RobloxManager, "get_roblox_version_string",
                         staticmethod(lambda: "version-installedOLD"))
@@ -162,7 +162,7 @@ def test_auto_version_skips_download_when_fix_already_running(api, monkeypatch):
 
 
 def test_auto_version_skips_download_when_cdn_unreachable(api, monkeypatch):
-    """No latest_production known ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ no honest target ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ don't act."""
+    """No latest_production known Ã¢â€ â€™ no honest target Ã¢â€ â€™ don't act."""
     _stub_common(monkeypatch)
     monkeypatch.setattr(RobloxManager, "get_roblox_version_string",
                         staticmethod(lambda: "version-installedOLD"))

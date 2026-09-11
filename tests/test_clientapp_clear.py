@@ -95,7 +95,7 @@ def test_writable_dirs_are_stock_only(tmp_path, monkeypatch):
 
 
 def test_apply_and_clear_skip_third_party(tmp_path, monkeypatch):
-    """A full applyÃ¢â€ â€™clear cycle must leave a third-party build's flags untouched."""
+    """A full apply→clear cycle must leave a third-party build's flags untouched."""
     local = tmp_path / "Local"
     stock = local / "Roblox" / "Versions" / "version-stock"
     stock.mkdir(parents=True)
